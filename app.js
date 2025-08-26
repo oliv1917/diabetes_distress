@@ -588,15 +588,21 @@ function renderExercise(root, page){
   /* ===== Coping Plan ===== */
   if(kind==="coping-plan"){
     var cp=state.exercises[id]?state.exercises[id]:{signals:[],supports:[],list:[]}; if(!cp.signals) cp.signals=[]; if(!cp.supports) cp.supports=[]; if(!cp.list) cp.list=[];
-    root.innerHTML='<div class="exercise"><h2>'+page.title+'</h2>'
+    root.innerHTML=DOMPurify.sanitize('<div class="exercise"><h2>'+page.title+'</h2>'
       +'<div class="row"><label class="field"><span>'+te("earlySign")+'</span><input id="cpSig" type="text"></label><button class="primary" id="cpAddSig">'+t("add")+'</button></div><div class="badgebar" id="cpSigList"></div>'
       +'<div class="row"><label class="field"><span>'+te("support")+'</span><input id="cpSup" type="text"></label><button class="primary" id="cpAddSup">'+t("add")+'</button></div><div class="badgebar" id="cpSupList"></div>'
       +'<div class="row"><label class="field"><span>'+te("step")+'</span><input id="cpStep" type="text"></label><button class="primary" id="cpAddStep">'+t("add")+'</button></div><div class="list" id="cpSteps"></div>'
-      +'<div class="cta-row"><button class="primary" id="cpSave">'+t("save")+'</button></div></div>';
+      +'<div class="cta-row"><button class="primary" id="cpSave">'+t("save")+'</button></div></div>');
     function paint(){
-      document.getElementById("cpSigList").innerHTML = cp.signals.length? cp.signals.map(function(s,i){return '<span class="chip">'+s+' <button data-t="sig" data-i="'+i+'">×</button></span>';}).join('') : "<span class='tiny'>"+te("noSigns")+"</span>";
-      document.getElementById("cpSupList").innerHTML = cp.supports.length? cp.supports.map(function(s,i){return '<span class="chip">'+s+' <button data-t="sup" data-i="'+i+'">×</button></span>';}).join('') : "<span class='tiny'>"+te("noSupports")+"</span>";
-      document.getElementById("cpSteps").innerHTML = cp.list.length? cp.list.map(function(s,i){return '<div class="item"><div>'+s+'</div><button class="ghost" data-t="step" data-i="'+i+'">'+t("delete")+'</button></div>';}).join('') : "<div class='tiny'>"+te("noSteps")+"</div>";
+      var sigList=document.getElementById("cpSigList");
+      sigList.textContent="";
+      if(cp.signals.length){ cp.signals.forEach(function(s,i){ var chip=document.createElement("span"); chip.className="chip"; var txt=document.createElement("span"); txt.textContent=s; var btn=document.createElement("button"); btn.setAttribute("data-t","sig"); btn.setAttribute("data-i",i); btn.textContent="×"; chip.appendChild(txt); chip.appendChild(btn); sigList.appendChild(chip); }); } else { var emptySig=document.createElement("span"); emptySig.className="tiny"; emptySig.textContent=te("noSigns"); sigList.appendChild(emptySig); }
+      var supList=document.getElementById("cpSupList");
+      supList.textContent="";
+      if(cp.supports.length){ cp.supports.forEach(function(s,i){ var chip=document.createElement("span"); chip.className="chip"; var txt=document.createElement("span"); txt.textContent=s; var btn=document.createElement("button"); btn.setAttribute("data-t","sup"); btn.setAttribute("data-i",i); btn.textContent="×"; chip.appendChild(txt); chip.appendChild(btn); supList.appendChild(chip); }); } else { var emptySup=document.createElement("span"); emptySup.className="tiny"; emptySup.textContent=te("noSupports"); supList.appendChild(emptySup); }
+      var stepList=document.getElementById("cpSteps");
+      stepList.textContent="";
+      if(cp.list.length){ cp.list.forEach(function(s,i){ var row=document.createElement("div"); row.className="item"; var div=document.createElement("div"); div.textContent=s; var btn=document.createElement("button"); btn.className="ghost"; btn.setAttribute("data-t","step"); btn.setAttribute("data-i",i); btn.textContent=t("delete"); row.appendChild(div); row.appendChild(btn); stepList.appendChild(row); }); } else { var emptyStep=document.createElement("div"); emptyStep.className="tiny"; emptyStep.textContent=te("noSteps"); stepList.appendChild(emptyStep); }
       var btns=document.querySelectorAll("#cpSigList button,#cpSupList button,#cpSteps button");
       for(var i=0;i<btns.length;i++){ (function(b){ b.onclick=function(){ var ttype=b.getAttribute('data-t'), ii=+b.getAttribute('data-i'); if(ttype==="sig") cp.signals.splice(ii,1); else if(ttype==="sup") cp.supports.splice(ii,1); else cp.list.splice(ii,1); Store.save(state); paint(); }; })(btns[i]); }
     }
@@ -627,18 +633,16 @@ function renderExercise(root, page){
   /* ===== Relapse Plan ===== */
   if(kind==="relapse-plan"){
     var data=state.exercises[id]?state.exercises[id]:{risks:[],ifThen:[]}; if(!data.risks) data.risks=[]; if(!data.ifThen) data.ifThen=[];
-    root.innerHTML='<div class="exercise"><h2>'+page.title+'</h2>'
+    root.innerHTML=DOMPurify.sanitize('<div class="exercise"><h2>'+page.title+'</h2>'
       +'<div class="row"><label class="field"><span>'+te("risk")+'</span><input id="rpRisk" type="text"></label><button class="primary" id="rpAddRisk">'+t("add")+'</button></div><div class="badgebar" id="rpRisks"></div>'
-      +'<div class="row"><label class="field"><span>'+te("ifCue")+'</span><input id="rpIf" type="text"></label><label class="field"><span>'+te("thenAct")+'</span><input id="rpThen" type="text"></label><button class="primary" id="rpAddPair">'+te("addPair")+'</button></div><div class="list" id="rpPairs"></div></div>';
+      +'<div class="row"><label class="field"><span>'+te("ifCue")+'</span><input id="rpIf" type="text"></label><label class="field"><span>'+te("thenAct")+'</span><input id="rpThen" type="text"></label><button class="primary" id="rpAddPair">'+te("addPair")+'</button></div><div class="list" id="rpPairs"></div></div>');
     function paint(){
-      var risksHTML=data.risks.map(function(r,i){return '<span class="chip">'+r+' <button data-i="'+i+'">×</button></span>';}).join('');
-      document.getElementById("rpRisks").innerHTML=risksHTML||"<span class='tiny'>"+te("noRisks")+"</span>";
-      var pairHTML=data.ifThen.map(function(p,i){
-        return (state.lang==="da"
-          ? '<div class="item"><div><strong>Hvis</strong> '+p.if+' <strong>så</strong> '+p.then+'</div><button class="ghost" data-i="'+i+'">'+t("delete")+'</button></div>'
-          : '<div class="item"><div><strong>If</strong> '+p.if+' <strong>then</strong> '+p.then+'</div><button class="ghost" data-i="'+i+'">'+t("delete")+'</button></div>');
-      }).join('');
-      document.getElementById("rpPairs").innerHTML=pairHTML||"<div class='tiny'>"+te("noPairs")+"</div>";
+      var riskList=document.getElementById("rpRisks");
+      riskList.textContent="";
+      if(data.risks.length){ data.risks.forEach(function(r,i){ var chip=document.createElement("span"); chip.className="chip"; var txt=document.createElement("span"); txt.textContent=r; var btn=document.createElement("button"); btn.setAttribute("data-i",i); btn.textContent="×"; chip.appendChild(txt); chip.appendChild(btn); riskList.appendChild(chip); }); } else { var emptyRisk=document.createElement("span"); emptyRisk.className="tiny"; emptyRisk.textContent=te("noRisks"); riskList.appendChild(emptyRisk); }
+      var pairList=document.getElementById("rpPairs");
+      pairList.textContent="";
+      if(data.ifThen.length){ data.ifThen.forEach(function(p,i){ var item=document.createElement("div"); item.className="item"; var textDiv=document.createElement("div"); var strongIf=document.createElement("strong"); strongIf.textContent=state.lang==="da"?"Hvis":"If"; textDiv.appendChild(strongIf); textDiv.appendChild(document.createTextNode(" "+p.if+" ")); var strongThen=document.createElement("strong"); strongThen.textContent=state.lang==="da"?"så":"then"; textDiv.appendChild(strongThen); textDiv.appendChild(document.createTextNode(" "+p.then)); item.appendChild(textDiv); var btn=document.createElement("button"); btn.className="ghost"; btn.setAttribute("data-i",i); btn.textContent=t("delete"); item.appendChild(btn); pairList.appendChild(item); }); } else { var emptyPair=document.createElement("div"); emptyPair.className="tiny"; emptyPair.textContent=te("noPairs"); pairList.appendChild(emptyPair); }
       var delRisk=document.querySelectorAll("#rpRisks button"); for(var i=0;i<delRisk.length;i++){ (function(b){ b.onclick=function(){ var idx=+b.getAttribute('data-i'); data.risks.splice(idx,1); Store.save(state); paint(); }; })(delRisk[i]); }
       var delPair=document.querySelectorAll("#rpPairs button"); for(var j=0;j<delPair.length;j++){ (function(b){ b.onclick=function(){ var idx=+b.getAttribute('data-i'); data.ifThen.splice(idx,1); Store.save(state); paint(); }; })(delPair[j]); }
     }
