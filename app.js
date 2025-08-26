@@ -179,6 +179,55 @@ function toast(msg){ let d=document.createElement("div"); d.textContent=msg;
 }
 function clamp(n,min,max){ return Math.max(min, Math.min(max, n)); }
 
+function initDrawer(){
+  const drawer = document.getElementById("drawer");
+  const overlay = document.getElementById("drawerOverlay");
+  const menuBtn = document.getElementById("menuBtn");
+  if(!drawer || !overlay || !menuBtn) return;
+
+  function trapFocus(e){
+    if(e.key !== "Tab") return;
+    const focusable = drawer.querySelectorAll('a, button, input, textarea, select, [tabindex]:not([tabindex="-1"])');
+    if(focusable.length === 0) return;
+    const first = focusable[0];
+    const last = focusable[focusable.length - 1];
+    if(e.shiftKey && document.activeElement === first){ e.preventDefault(); last.focus(); }
+    else if(!e.shiftKey && document.activeElement === last){ e.preventDefault(); first.focus(); }
+  }
+
+  function open(){
+    drawer.classList.add("open");
+    overlay.classList.add("show");
+    overlay.removeAttribute("hidden");
+    menuBtn.setAttribute("aria-expanded","true");
+    document.body.style.overflow = "hidden";
+    const focusable = drawer.querySelectorAll('a, button, input, textarea, select, [tabindex]:not([tabindex="-1"])');
+    (focusable[0] || drawer).focus();
+    drawer.addEventListener("keydown", trapFocus);
+  }
+
+  function close(){
+    drawer.classList.remove("open");
+    overlay.classList.remove("show");
+    overlay.setAttribute("hidden","");
+    menuBtn.setAttribute("aria-expanded","false");
+    document.body.style.overflow = "";
+    drawer.removeEventListener("keydown", trapFocus);
+    menuBtn.focus();
+  }
+
+  menuBtn.addEventListener("click", () => {
+    if(drawer.classList.contains("open")) close(); else open();
+  });
+  overlay.addEventListener("click", close);
+  document.addEventListener("keydown", e => {
+    if(e.key === "Escape" && drawer.classList.contains("open")) close();
+  });
+  window.addEventListener("resize", () => {
+    if(window.innerWidth >= 768) close();
+  });
+}
+
 /* Exercise locale strings */
 const EX={
   en:{add:"Add",save:"Save",delete:"Delete",done:"Done",edit:"Edit",
@@ -701,6 +750,7 @@ function renderExercise(root, page){
 
 /* ========== Language Switcher & Init ========== */
 function init() {
+  initDrawer();
   document.getElementById("langSelect").onchange = e => {
     state.lang = e.target.value;
     Store.save(state);

@@ -12,6 +12,7 @@
 <body>
 <header>
   <div class="wrap topbar">
+    <button class="ghost" id="menuBtn" aria-label="Menu"><span class="sr-only">Menu</span>☰</button>
     <div class="brand">
       <div class="logo"></div>
       <div>
@@ -32,11 +33,15 @@
   </div>
 </header>
 
+<div id="drawerOverlay" class="overlay" hidden></div>
+
 <div class="wrap layout">
-  <aside class="card sidebar">
-    <h2 id="modulesTitle"></h2>
-    <div id="moduleList"></div>
-  </aside>
+  <div id="drawer" class="drawer">
+    <aside class="card sidebar">
+      <h2 id="modulesTitle"></h2>
+      <div id="moduleList"></div>
+    </aside>
+  </div>
 
   <main class="card" id="main" role="main">
     <!-- Home / module pages are injected here -->
