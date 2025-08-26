@@ -4,6 +4,17 @@
     --card:#111827; --chip:#1f2937; --border:#1f2937; --shadow:0 10px 30px rgba(0,0,0,.35); --radius:14px;
   }
   *{box-sizing:border-box}
+  .sr-only{
+    position:absolute;
+    width:1px;
+    height:1px;
+    padding:0;
+    margin:-1px;
+    overflow:hidden;
+    clip:rect(0,0,0,0);
+    white-space:nowrap;
+    border:0;
+  }
   html,body{height:100%}
   body{
     margin:0; font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,'Helvetica Neue',Arial;
