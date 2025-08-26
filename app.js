@@ -28,6 +28,7 @@ const Lang = {
     downloadData: "Download data",
     clearData: "Clear all data",
     confirmClear: "This will erase all data. Continue?",
+    confirmDelete: "Delete this item?",
     /* NEW */
     progressTitle: "Your Progress",
     badgesTitle: "Badges",
@@ -109,6 +110,7 @@ const Lang = {
     downloadData: "Download data",
     clearData: "Slet alle data",
     confirmClear: "Er du sikker på, at du vil slette alle data? Dette kan ikke fortrydes.",
+    confirmDelete: "Slet dette element?",
     /* NEW */
     progressTitle: "Dit fremskridt",
     badgesTitle: "Mærker",
@@ -401,7 +403,7 @@ function renderExercise(root, page){
         btn.className="ghost";
         btn.setAttribute('data-i',idx);
         btn.textContent=t("delete");
-        btn.onclick=function(){ items.splice(idx,1); state.exercises[id]={items:items}; Store.save(state); paint(); };
+        btn.onclick=function(){ if(confirm(t("confirmDelete"))){ items.splice(idx,1); state.exercises[id]={items:items}; Store.save(state); paint(); } };
         row.appendChild(btn);
         list.appendChild(row);
       });
@@ -455,7 +457,7 @@ function renderExercise(root, page){
         btn.className="ghost";
         btn.setAttribute('data-i',i);
         btn.textContent=t("delete");
-        btn.onclick=function(){ rows.splice(i,1); state.exercises[id]={rows:rows}; Store.save(state); paint(); };
+        btn.onclick=function(){ if(confirm(t("confirmDelete"))){ rows.splice(i,1); state.exercises[id]={rows:rows}; Store.save(state); paint(); } };
         el.appendChild(btn);
         list.appendChild(el);
       });
@@ -566,7 +568,7 @@ function renderExercise(root, page){
         btn.className="ghost";
         btn.setAttribute('data-i',i);
         btn.textContent=t("delete");
-        btn.onclick=function(){ acts.splice(i,1); state.exercises[id]={acts:acts}; Store.save(state); paint(); };
+        btn.onclick=function(){ if(confirm(t("confirmDelete"))){ acts.splice(i,1); state.exercises[id]={acts:acts}; Store.save(state); paint(); } };
         row2.appendChild(btn);
         row.appendChild(row2);
         input.onchange=function(e){ acts[i].done=e.target.checked; state.exercises[id]={acts:acts}; Store.save(state); };
@@ -610,7 +612,7 @@ function renderExercise(root, page){
         topEl.appendChild(chip);
       });
       let btns=topEl.querySelectorAll('button');
-      for(let i=0;i<btns.length;i++){ (function(b){ b.onclick=function(){ let idx=+b.getAttribute('data-i'); chosen.splice(idx,1); renderTop(); }; })(btns[i]); }
+      for(let i=0;i<btns.length;i++){ (function(b){ b.onclick=function(){ if(confirm(t("confirmDelete"))){ let idx=+b.getAttribute('data-i'); chosen.splice(idx,1); renderTop(); } }; })(btns[i]); }
     }
     document.getElementById("vsSave").onclick=function(){ let action=document.getElementById("vsAction").value.trim(); state.exercises[id]={top:chosen.slice(), action:action};
       state.timeline.push({t:now(),what:"Saved values"}); awardBadges(); Store.save(state); toast(EX[state.lang].saved); };
@@ -648,7 +650,7 @@ function renderExercise(root, page){
       stepList.textContent="";
       if(cp.list.length){ cp.list.forEach(function(s,i){ let row=document.createElement("div"); row.className="item"; let div=document.createElement("div"); div.textContent=s; let btn=document.createElement("button"); btn.className="ghost"; btn.setAttribute("data-t","step"); btn.setAttribute("data-i",i); btn.textContent=t("delete"); row.appendChild(div); row.appendChild(btn); stepList.appendChild(row); }); } else { let emptyStep=document.createElement("div"); emptyStep.className="tiny"; emptyStep.textContent=te("noSteps"); stepList.appendChild(emptyStep); }
       let btns=document.querySelectorAll("#cpSigList button,#cpSupList button,#cpSteps button");
-      for(let i=0;i<btns.length;i++){ (function(b){ b.onclick=function(){ let ttype=b.getAttribute('data-t'), ii=+b.getAttribute('data-i'); if(ttype==="sig") cp.signals.splice(ii,1); else if(ttype==="sup") cp.supports.splice(ii,1); else cp.list.splice(ii,1); Store.save(state); paint(); }; })(btns[i]); }
+      for(let i=0;i<btns.length;i++){ (function(b){ b.onclick=function(){ if(confirm(t("confirmDelete"))){ let ttype=b.getAttribute('data-t'), ii=+b.getAttribute('data-i'); if(ttype==="sig") cp.signals.splice(ii,1); else if(ttype==="sup") cp.supports.splice(ii,1); else cp.list.splice(ii,1); Store.save(state); paint(); } }; })(btns[i]); }
     }
     document.getElementById("cpAddSig").onclick=function(){ let v=document.getElementById("cpSig").value.trim(); if(!v) return; cp.signals.push(v); Store.save(state); document.getElementById("cpSig").value=""; paint(); };
     document.getElementById("cpAddSup").onclick=function(){ let v=document.getElementById("cpSup").value.trim(); if(!v) return; cp.supports.push(v); Store.save(state); document.getElementById("cpSup").value=""; paint(); };
@@ -687,8 +689,8 @@ function renderExercise(root, page){
       let pairList=document.getElementById("rpPairs");
       pairList.textContent="";
       if(data.ifThen.length){ data.ifThen.forEach(function(p,i){ let item=document.createElement("div"); item.className="item"; let textDiv=document.createElement("div"); let strongIf=document.createElement("strong"); strongIf.textContent=state.lang==="da"?"Hvis":"If"; textDiv.appendChild(strongIf); textDiv.appendChild(document.createTextNode(" "+p.if+" ")); let strongThen=document.createElement("strong"); strongThen.textContent=state.lang==="da"?"så":"then"; textDiv.appendChild(strongThen); textDiv.appendChild(document.createTextNode(" "+p.then)); item.appendChild(textDiv); let btn=document.createElement("button"); btn.className="ghost"; btn.setAttribute("data-i",i); btn.textContent=t("delete"); item.appendChild(btn); pairList.appendChild(item); }); } else { let emptyPair=document.createElement("div"); emptyPair.className="tiny"; emptyPair.textContent=te("noPairs"); pairList.appendChild(emptyPair); }
-      let delRisk=document.querySelectorAll("#rpRisks button"); for(let i=0;i<delRisk.length;i++){ (function(b){ b.onclick=function(){ let idx=+b.getAttribute('data-i'); data.risks.splice(idx,1); Store.save(state); paint(); }; })(delRisk[i]); }
-      let delPair=document.querySelectorAll("#rpPairs button"); for(let j=0;j<delPair.length;j++){ (function(b){ b.onclick=function(){ let idx=+b.getAttribute('data-i'); data.ifThen.splice(idx,1); Store.save(state); paint(); }; })(delPair[j]); }
+      let delRisk=document.querySelectorAll("#rpRisks button"); for(let i=0;i<delRisk.length;i++){ (function(b){ b.onclick=function(){ if(confirm(t("confirmDelete"))){ let idx=+b.getAttribute('data-i'); data.risks.splice(idx,1); Store.save(state); paint(); } }; })(delRisk[i]); }
+      let delPair=document.querySelectorAll("#rpPairs button"); for(let j=0;j<delPair.length;j++){ (function(b){ b.onclick=function(){ if(confirm(t("confirmDelete"))){ let idx=+b.getAttribute('data-i'); data.ifThen.splice(idx,1); Store.save(state); paint(); } }; })(delPair[j]); }
     }
     document.getElementById("rpAddRisk").onclick=function(){ let v=document.getElementById("rpRisk").value.trim(); if(!v) return; data.risks.push(v); Store.save(state); document.getElementById("rpRisk").value=""; paint(); };
     document.getElementById("rpAddPair").onclick=function(){ let iff=document.getElementById("rpIf").value.trim(), then=document.getElementById("rpThen").value.trim(); if(!iff||!then) return; data.ifThen.push({if:iff,then:then}); Store.save(state); document.getElementById("rpIf").value=""; document.getElementById("rpThen").value=""; paint(); };
