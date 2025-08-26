@@ -301,13 +301,13 @@ function renderExercise(root, page){
     let last=(state.exercises[id]&&typeof state.exercises[id].rating==='number')?state.exercises[id].rating:4;
     let prevBody=(state.exercises[id]&&state.exercises[id].body)?state.exercises[id].body:'';
     let prevNote=(state.exercises[id]&&state.exercises[id].note)?state.exercises[id].note:'';
-    root.innerHTML='<div class="exercise"><h2>'+page.title+'</h2>'
+    root.innerHTML=DOMPurify.sanitize('<div class="exercise"><h2>'+page.title+'</h2>'
       +'<div class="row"><label class="field"><span>'+te("distressQ")+'</span>'
         +'<input type="range" min="0" max="10" value="'+last+'" id="drRange"><div class="row"><span class="chip" id="drVal">'+last+'</span></div></label>'
         +'<label class="field"><span>'+te("bodyQ")+'</span><input type="text" id="drBody" value="'+prevBody+'"></label></div>'
       +'<label class="field"><span>'+te("noteQ")+'</span><textarea id="drNote" rows="3">'+prevNote+'</textarea></label>'
       +'<div class="cta-row"><button class="primary" id="drSave">'+t("save")+'</button><button id="drTrend">'+te("viewTrend")+'</button></div>'
-      +'<canvas id="miniChart" width="600" height="160" style="width:100%;max-width:100%"></canvas></div>';
+      +'<canvas id="miniChart" width="600" height="160" style="width:100%;max-width:100%"></canvas></div>');
     let range=document.getElementById("drRange"), val=document.getElementById("drVal");
     if(range&&val){ range.oninput=function(){ val.textContent=range.value; }; }
     function draw(){
@@ -346,9 +346,23 @@ function renderExercise(root, page){
     function paint(){
       let list=document.getElementById("tgList"); list.innerHTML=items.length?"":"<div class='tiny'>"+te("noTriggers")+"</div>";
       items.forEach(function(it,idx){
-        let row=document.createElement('div'); row.className="item";
-        row.innerHTML='<div><strong>'+it.n+'</strong><div class="tiny">'+it.t+' • '+it.f+'</div></div><button class="ghost" data-i="'+idx+'">'+t("delete")+'</button>';
-        row.querySelector('button').onclick=function(){ items.splice(idx,1); state.exercises[id]={items:items}; Store.save(state); paint(); };
+        let row=document.createElement('div');
+        row.className="item";
+        let info=document.createElement('div');
+        let strong=document.createElement('strong');
+        strong.textContent=it.n;
+        info.appendChild(strong);
+        let tiny=document.createElement('div');
+        tiny.className="tiny";
+        tiny.textContent=it.t+' • '+it.f;
+        info.appendChild(tiny);
+        row.appendChild(info);
+        let btn=document.createElement('button');
+        btn.className="ghost";
+        btn.setAttribute('data-i',idx);
+        btn.textContent=t("delete");
+        btn.onclick=function(){ items.splice(idx,1); state.exercises[id]={items:items}; Store.save(state); paint(); };
+        row.appendChild(btn);
         list.appendChild(row);
       });
     }
@@ -375,9 +389,34 @@ function renderExercise(root, page){
     function paint(){
       let list=document.getElementById("trList"); list.innerHTML=rows.length?"":"<div class='tiny'>"+te("noEntries")+"</div>";
       rows.forEach(function(r,i){
-        let el=document.createElement('div'); el.className="item";
-        el.innerHTML='<div><div><strong>'+r.sit+'</strong> — <em>'+r.thought+'</em> ( '+r.feel+'/10 )</div><div class="tiny">'+te("evidence")+': '+r.evi+'</div><div class="tiny">'+te("altThought")+': '+r.alt+'</div></div><button class="ghost" data-i="'+i+'">'+t("delete")+'</button>';
-        el.querySelector('button').onclick=function(){ rows.splice(i,1); state.exercises[id]={rows:rows}; Store.save(state); paint(); };
+        let el=document.createElement('div');
+        el.className="item";
+        let wrap=document.createElement('div');
+        let top=document.createElement('div');
+        let strong=document.createElement('strong');
+        strong.textContent=r.sit;
+        top.appendChild(strong);
+        top.appendChild(document.createTextNode(' — '));
+        let em=document.createElement('em');
+        em.textContent=r.thought;
+        top.appendChild(em);
+        top.appendChild(document.createTextNode(' ( '+r.feel+'/10 )'));
+        wrap.appendChild(top);
+        let eviDiv=document.createElement('div');
+        eviDiv.className="tiny";
+        eviDiv.textContent=te("evidence")+': '+r.evi;
+        wrap.appendChild(eviDiv);
+        let altDiv=document.createElement('div');
+        altDiv.className="tiny";
+        altDiv.textContent=te("altThought")+': '+r.alt;
+        wrap.appendChild(altDiv);
+        el.appendChild(wrap);
+        let btn=document.createElement('button');
+        btn.className="ghost";
+        btn.setAttribute('data-i',i);
+        btn.textContent=t("delete");
+        btn.onclick=function(){ rows.splice(i,1); state.exercises[id]={rows:rows}; Store.save(state); paint(); };
+        el.appendChild(btn);
         list.appendChild(el);
       });
     }
@@ -429,14 +468,14 @@ function renderExercise(root, page){
   if(kind==="problem-solver"){
     let data=state.exercises[id]?state.exercises[id]:{problem:"",options:[],chosen:[],plan:{when:"",where:"",how:""}};
     if(!data.options) data.options=[]; if(!data.chosen) data.chosen=[]; if(!data.plan) data.plan={when:"",where:"",how:""};
-    root.innerHTML='<div class="exercise"><h2>'+page.title+'</h2>'
+    root.innerHTML=DOMPurify.sanitize('<div class="exercise"><h2>'+page.title+'</h2>'
       +'<label class="field"><span>'+te("defineProblem")+'</span><input id="psProb" type="text" value="'+(data.problem||'')+'"></label>'
       +'<div class="row"><label class="field"><span>'+te("option")+'</span><input id="psOpt" type="text"></label><button class="primary" id="psAdd">'+te("addOption")+'</button></div>'
       +'<div id="psOptions" class="badgebar"></div>'
       +'<div class="row"><label class="field"><span>'+te("when")+'</span><input id="psWhen" type="text" value="'+(data.plan.when||'')+'"></label>'
       +'<label class="field"><span>'+te("where")+'</span><input id="psWhere" type="text" value="'+(data.plan.where||'')+'"></label>'
       +'<label class="field"><span>'+te("how")+'</span><input id="psHow" type="text" value="'+(data.plan.how||'')+'"></label></div>'
-      +'<div class="cta-row"><button class="primary" id="psSave">'+te("savePlan")+'</button></div></div>';
+      +'<div class="cta-row"><button class="primary" id="psSave">'+te("savePlan")+'</button></div></div>');
     let chosen=(function(arr){let s=new Set(); for(let i=0;i<arr.length;i++) s.add(arr[i]); return s;})(data.chosen||[]);
     function renderOptions(){ let cont=document.getElementById("psOptions"); cont.innerHTML=data.options.length?"":"<span class=\"tiny\">"+te("selectHint")+"</span>";
       data.options.forEach(function(o,i){ let el=document.createElement('span'); el.className="chip"; el.textContent=o+(chosen.has(i)?" ✓":""); el.onclick=function(){ if(chosen.has(i)) chosen.delete(i); else chosen.add(i); renderOptions(); }; cont.appendChild(el); });
@@ -459,10 +498,38 @@ function renderExercise(root, page){
       +'<button class="primary" id="apAdd">'+t("add")+'</button></div>'
       +'<div class="list" id="apList"></div></div>';
     function paint(){ let list=document.getElementById("apList"); list.innerHTML=acts.length?"":"<div class=\"tiny\">"+te("noActions")+"</div>";
-      acts.forEach(function(a,i){ let row=document.createElement('div'); row.className="item";
-        row.innerHTML='<div><strong>'+a.task+'</strong> <span class="tiny">Cost '+a.cost+'/5 • '+a.when+'</span></div><div class="row"><label class="chip"><input type="checkbox" '+(a.done?'checked':'')+' data-i="'+i+'"> '+te("done")+'</label><button class="ghost" data-i="'+i+'">'+t("delete")+'</button></div>';
-        row.querySelector('input').onchange=function(e){ acts[i].done=e.target.checked; state.exercises[id]={acts:acts}; Store.save(state); };
-        row.querySelector('button').onclick=function(){ acts.splice(i,1); state.exercises[id]={acts:acts}; Store.save(state); paint(); };
+      acts.forEach(function(a,i){
+        let row=document.createElement('div');
+        row.className="item";
+        let top=document.createElement('div');
+        let strong=document.createElement('strong');
+        strong.textContent=a.task;
+        top.appendChild(strong);
+        let span=document.createElement('span');
+        span.className="tiny";
+        span.textContent='Cost '+a.cost+'/5 • '+a.when;
+        top.appendChild(document.createTextNode(' '));
+        top.appendChild(span);
+        row.appendChild(top);
+        let row2=document.createElement('div');
+        row2.className="row";
+        let label=document.createElement('label');
+        label.className="chip";
+        let input=document.createElement('input');
+        input.type="checkbox";
+        if(a.done) input.checked=true;
+        input.setAttribute('data-i',i);
+        label.appendChild(input);
+        label.appendChild(document.createTextNode(' '+te("done")));
+        row2.appendChild(label);
+        let btn=document.createElement('button');
+        btn.className="ghost";
+        btn.setAttribute('data-i',i);
+        btn.textContent=t("delete");
+        btn.onclick=function(){ acts.splice(i,1); state.exercises[id]={acts:acts}; Store.save(state); paint(); };
+        row2.appendChild(btn);
+        row.appendChild(row2);
+        input.onchange=function(e){ acts[i].done=e.target.checked; state.exercises[id]={acts:acts}; Store.save(state); };
         list.appendChild(row);
       }); }
     document.getElementById("apAdd").onclick=function(){ let task=document.getElementById("apTask").value.trim(), cost=+document.getElementById("apCost").value, when=document.getElementById("apWhen").value.trim();
@@ -481,9 +548,30 @@ function renderExercise(root, page){
       +'<label class="field"><span>'+te("oneAction")+'</span><input id="vsAction" type="text"></label><div class="cta-row"><button class="primary" id="vsSave">'+t("save")+'</button></div></div>';
     function renderPool(){ let poolEl=document.getElementById("vsPool"); poolEl.innerHTML=pool.map(function(v){return '<span class="chip">'+v+'</span>';}).join('');
       let chips=poolEl.querySelectorAll('.chip'); for(let i=0;i<chips.length;i++){ (function(ch){ ch.onclick=function(){ if(chosen.indexOf(ch.textContent)===-1){ chosen.push(ch.textContent); renderTop(); } }; })(chips[i]); } }
-    function renderTop(){ let topEl=document.getElementById("vsTop"); if(!chosen.length){ topEl.innerHTML="<span class='tiny'>"+(state.lang==="da"?"Ingen værdier valgt endnu.":"No values selected yet.")+"</span>"; return; }
-      topEl.innerHTML=chosen.map(function(v,i){return '<span class="chip">'+v+' <button aria-label="remove" data-i="'+i+'">×</button></span>';}).join('');
-      let btns=topEl.querySelectorAll('button'); for(let i=0;i<btns.length;i++){ (function(b){ b.onclick=function(){ let idx=+b.getAttribute('data-i'); chosen.splice(idx,1); renderTop(); }; })(btns[i]); } }
+    function renderTop(){
+      let topEl=document.getElementById("vsTop");
+      topEl.textContent="";
+      if(!chosen.length){
+        let span=document.createElement('span');
+        span.className='tiny';
+        span.textContent=(state.lang==="da"?"Ingen værdier valgt endnu.":"No values selected yet.");
+        topEl.appendChild(span);
+        return;
+      }
+      chosen.forEach(function(v,i){
+        let chip=document.createElement('span');
+        chip.className='chip';
+        chip.appendChild(document.createTextNode(v+' '));
+        let btn=document.createElement('button');
+        btn.setAttribute('aria-label','remove');
+        btn.dataset.i=i;
+        btn.textContent='×';
+        chip.appendChild(btn);
+        topEl.appendChild(chip);
+      });
+      let btns=topEl.querySelectorAll('button');
+      for(let i=0;i<btns.length;i++){ (function(b){ b.onclick=function(){ let idx=+b.getAttribute('data-i'); chosen.splice(idx,1); renderTop(); }; })(btns[i]); }
+    }
     document.getElementById("vsSave").onclick=function(){ let action=document.getElementById("vsAction").value.trim(); state.exercises[id]={top:chosen.slice(), action:action};
       state.timeline.push({t:now(),what:"Saved values"}); awardBadges(); Store.save(state); toast(EX[state.lang].saved); };
     renderPool(); renderTop();
@@ -532,13 +620,13 @@ function renderExercise(root, page){
   /* ===== Care Script ===== */
   if(kind==="care-script"){
     let data=state.exercises[id]?state.exercises[id]:{context:"",observation:"",preference:"",enlist:""};
-    root.innerHTML='<div class="exercise"><h2>'+page.title+'</h2>'
+    root.innerHTML=DOMPurify.sanitize('<div class="exercise"><h2>'+page.title+'</h2>'
       +'<div class="row"><label class="field"><span>'+te("context")+'</span><input id="csCtx" type="text" value="'+(data.context||'')+'"></label>'
       +'<label class="field"><span>'+te("observation")+'</span><input id="csObs" type="text" value="'+(data.observation||'')+'"></label></div>'
       +'<div class="row"><label class="field"><span>'+te("preference")+'</span><input id="csPref" type="text" value="'+(data.preference||'')+'"></label>'
       +'<label class="field"><span>'+te("enlist")+'</span><input id="csEn" type="text" value="'+(data.enlist||'')+'"></label></div>'
       +'<div class="notice"><strong>'+te("preview")+'</strong><div id="csPreview" class="tiny"></div></div>'
-      +'<div class="cta-row"><button class="primary" id="csSave">'+t("save")+'</button></div></div>';
+      +'<div class="cta-row"><button class="primary" id="csSave">'+t("save")+'</button></div></div>');
     function preview(){ let ctx=(document.getElementById("csCtx").value||'—'), obs=(document.getElementById("csObs").value||'—'), pref=(document.getElementById("csPref").value||'—'), en=(document.getElementById("csEn").value||'—');
       document.getElementById("csPreview").textContent=(state.lang==="da"?"Kontekst: ":"Context: ")+ctx+" | "+(state.lang==="da"?"Observation: ":"Observation: ")+obs+" | "+(state.lang==="da"?"Præference: ":"Preference: ")+pref+" | "+(state.lang==="da"?"Engagér: ":"Enlist: ")+en; }
     ["csCtx","csObs","csPref","csEn"].forEach(function(id){ let el=document.getElementById(id); if(el) el.addEventListener('input', preview); });
