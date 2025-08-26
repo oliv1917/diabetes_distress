@@ -713,6 +713,7 @@ function init() {
 
   document.getElementById("dataBtn").onclick = () => {
     location.hash = "#data";
+    onRoute(); // trigger rendering immediately
   };
 
   window.addEventListener("hashchange", onRoute);
