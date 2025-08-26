@@ -221,7 +221,7 @@ function bumpStreak(){
   }
 }
 function awardBadges(){
-  let p=overallProgress();
+  let p=overallProgress(state);
   let set=[{th:.01,n:"Getting Started"},{th:.25,n:"Quarter Way"},{th:.5,n:"Halfway Hero"},{th:.75,n:"Almost There"},{th:.99,n:"Completed 🎉"}];
   for(let i=0;i<set.length;i++){
     let b=set[i]; if(p>=b.th && state.badges.indexOf(b.n)===-1){ state.badges.push(b.n); state.timeline.push({t:now(),what:"Badge: "+b.n}); }
@@ -230,7 +230,7 @@ function awardBadges(){
 }
 
 /* ========== Router & Progress ========== */
-function overallProgress(s){
+function overallProgress(s = state){
   const total = Lang[s.lang].modulesData.reduce((a,m)=>a+m.pages.length,0);
   return total ? Object.keys(s.completed).length/total : 0;
 }
