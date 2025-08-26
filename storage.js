@@ -17,10 +17,21 @@ export const Store = {
     return r;
   },
   encrypt(text) {
-    return btoa(this.xor(text, this.getSecret()));
+    const xorStr = this.xor(text, this.getSecret());
+    const bytes = new TextEncoder().encode(xorStr);
+    let binary = "";
+    for (const b of bytes) binary += String.fromCharCode(b);
+    return btoa(binary);
   },
   decrypt(c) {
-    return this.xor(atob(c), this.getSecret());
+    try {
+      const binary = atob(c);
+      const bytes = Uint8Array.from(binary, ch => ch.charCodeAt(0));
+      const decoded = new TextDecoder().decode(bytes);
+      return this.xor(decoded, this.getSecret());
+    } catch (e) {
+      return null;
+    }
   },
   validate(d) {
     const o = {};
@@ -44,7 +55,9 @@ export const Store = {
     try {
       const raw = localStorage.getItem(this.key);
       if (!raw) return this.validate({ version: this.version });
-      const data = JSON.parse(this.decrypt(raw));
+      const decrypted = this.decrypt(raw);
+      if (!decrypted) throw new Error("Malformed data");
+      const data = JSON.parse(decrypted);
       return this.validate(this.migrate(data));
     } catch (e) {
       return this.validate({ version: this.version });
