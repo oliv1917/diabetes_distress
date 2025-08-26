@@ -150,17 +150,51 @@ const Lang = {
   }
 };
 /* ========== Storage & State ========== */
-var Store={ key:"dd_icbt_state",
-  load:function(){ try{return JSON.parse(localStorage.getItem(this.key))||{};}catch(e){return{};} },
-  save:function(d){ localStorage.setItem(this.key, JSON.stringify(d)); }
+var Store={
+  key:"dd_icbt_state",
+  version:1,
+  getSecret:function(){
+    var s=localStorage.getItem(this.key+"_secret");
+    if(!s){ s=Math.random().toString(36).slice(2); localStorage.setItem(this.key+"_secret",s); }
+    return s;
+  },
+  xor:function(str,key){ var r=""; for(var i=0;i<str.length;i++){ r+=String.fromCharCode(str.charCodeAt(i)^key.charCodeAt(i%key.length)); } return r; },
+  encrypt:function(text){ return btoa(this.xor(text,this.getSecret())); },
+  decrypt:function(c){ return this.xor(atob(c),this.getSecret()); },
+  validate:function(d){
+    var o={};
+    o.version=typeof d.version==="number"?d.version:this.version;
+    o.lang=typeof d.lang==="string"?d.lang:"da";
+    o.completed=d.completed&&typeof d.completed==="object"?d.completed:{};
+    o.exercises=d.exercises&&typeof d.exercises==="object"?d.exercises:{};
+    o.streak=d.streak&&typeof d.streak.count==="number"?{last:d.streak.last||null,count:d.streak.count}:{last:null,count:0};
+    o.timeline=Array.isArray(d.timeline)?d.timeline:[];
+    o.badges=Array.isArray(d.badges)?d.badges:[];
+    return o;
+  },
+  migrate:function(d){
+    if(!d.version) d.version=1;
+    if(d.version<this.version){
+      d.version=this.version;
+    }
+    return d;
+  },
+  load:function(){
+    try{
+      var raw=localStorage.getItem(this.key);
+      if(!raw) return this.validate({version:this.version});
+      var data=JSON.parse(this.decrypt(raw));
+      return this.validate(this.migrate(data));
+    }catch(e){
+      return this.validate({version:this.version});
+    }
+  },
+  save:function(d){
+    var clean=this.validate(d); clean.version=this.version;
+    localStorage.setItem(this.key,this.encrypt(JSON.stringify(clean)));
+  }
 };
 var state=Store.load();
-if(!state.lang) state.lang="da";
-if(!state.completed) state.completed={};
-if(!state.exercises) state.exercises={};
-if(!state.streak) state.streak={last:null,count:0};
-if(!state.timeline) state.timeline=[];
-if(!state.badges) state.badges=[];
 
 /* ========== Helpers ========== */
 function t(k){ return Lang[state.lang][k]; }
