@@ -1,5 +1,5 @@
 import { Store } from './storage.js';
-import { renderTexts, renderSidebar, renderHome } from './render.js';
+import { renderTexts, renderSidebar, renderHome, renderData } from './render.js';
 
 const Lang = {
   en: {
@@ -22,6 +22,12 @@ const Lang = {
     pagesDone: "Pages completed",
     latestBadge: "Latest badge",
     footer: "© YEAR Diabetes Distress iCBT • Private by design (data stored only in your browser).",
+    data: "Data",
+    dataTitle: "Data & Privacy",
+    dataInfo: "All progress is stored only in this browser. You can download it or clear it.",
+    downloadData: "Download data",
+    clearData: "Clear all data",
+    confirmClear: "This will erase all data. Continue?",
     /* NEW */
     progressTitle: "Your Progress",
     badgesTitle: "Badges",
@@ -97,6 +103,12 @@ const Lang = {
     pagesDone: "Sider færdiggjort",
     latestBadge: "Seneste mærke",
     footer: "© YEAR Diabetes-stress iCBT • Gemmes kun i din browser.",
+    data: "Data",
+    dataTitle: "Data & privatliv",
+    dataInfo: "Alle fremskridt gemmes lokalt i denne browser. Du kan downloade eller slette dem.",
+    downloadData: "Download data",
+    clearData: "Slet alle data",
+    confirmClear: "Er du sikker på, at du vil slette alle data? Dette kan ikke fortrydes.",
     /* NEW */
     progressTitle: "Dit fremskridt",
     badgesTitle: "Mærker",
@@ -224,6 +236,34 @@ function overallProgress(s){
 }
 function navigateTo(mi, pi) { location.hash = `#/m/${mi}/p/${pi}`; }
 function onRoute(){
+  if (location.hash === "#data") {
+    renderSidebar(state, Lang, navigateTo);
+    renderData(state, t);
+    const dl = document.getElementById("downloadBtn");
+    if (dl) dl.onclick = () => {
+      Store.save(state);
+      const dataStr = JSON.stringify(state, null, 2);
+      const blob = new Blob([dataStr], {type:"application/json"});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "dd-data.json";
+      a.click();
+      URL.revokeObjectURL(url);
+    };
+    const cl = document.getElementById("clearBtn");
+    if (cl) cl.onclick = () => {
+      if (confirm(t("confirmClear"))) {
+        localStorage.removeItem(Store.key);
+        state = Store.load();
+        location.hash = "";
+        renderTexts(state, t);
+        renderSidebar(state, Lang, navigateTo);
+        renderHome(state, t, overallProgress);
+      }
+    };
+    return;
+  }
   const m = location.hash.match(/#\/m\/(\d+)\/p\/(\d+)/);
   if(!m){
     renderHome(state, t, overallProgress);
@@ -669,6 +709,10 @@ function init() {
   document.getElementById("homeBtn").onclick = () => {
     location.hash = "";
     renderHome(state, t, overallProgress);
+  };
+
+  document.getElementById("dataBtn").onclick = () => {
+    location.hash = "#data";
   };
 
   window.addEventListener("hashchange", onRoute);

@@ -8,6 +8,12 @@ export function renderTexts(state, t) {
   homeBtn.setAttribute("aria-label", t("home"));
   const sr = homeBtn.querySelector(".sr-only");
   if (sr) sr.textContent = t("home");
+  const dataBtn = document.getElementById("dataBtn");
+  if (dataBtn) {
+    dataBtn.setAttribute("aria-label", t("data"));
+    const sr2 = dataBtn.querySelector(".sr-only");
+    if (sr2) sr2.textContent = t("data");
+  }
   document.getElementById("langSelect").value = state.lang;
 }
 
@@ -58,5 +64,20 @@ export function renderHome(state, t, overallProgress) {
         + '<article class="flow"><h2>' + t("badgesTitle") + '</h2><div class="badgebar" id="badgeBar">' + badges + '</div></article>'
         + '<article class="flow"><h2>' + t("activityTitle") + '</h2><div class="timeline" id="timeline">' + recent + '</div></article>'
       + '</section>'
+    + '</div>';
+}
+export function renderData(state, t) {
+  const main = document.getElementById("main");
+  main.innerHTML = ''
+    + '<div class="page">'
+    +   '<div class="hero"><h1>' + t("dataTitle") + '</h1></div>'
+    +   '<section class="content flow">'
+    +     '<p>' + t("dataInfo") + '</p>'
+    +     '<div class="cta-row">'
+    +       '<button id="downloadBtn">' + t("downloadData") + '</button>'
+    +       '<div class="spacer"></div>'
+    +       '<button class="ghost" id="clearBtn">' + t("clearData") + '</button>'
+    +     '</div>'
+    +   '</section>'
     + '</div>';
 }
