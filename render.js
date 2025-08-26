@@ -4,6 +4,10 @@ export function renderTexts(state, t) {
   document.getElementById("modulesTitle").textContent = t("modules");
   document.getElementById("streakText").textContent = t("streak") + " " + (state.streak.count || 0);
   document.getElementById("footerText").textContent = t("footer").replace("YEAR", new Date().getFullYear());
+  const homeBtn = document.getElementById("homeBtn");
+  homeBtn.setAttribute("aria-label", t("home"));
+  const sr = homeBtn.querySelector(".sr-only");
+  if (sr) sr.textContent = t("home");
   document.getElementById("langSelect").value = state.lang;
 }
 
