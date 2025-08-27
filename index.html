@@ -21,15 +21,18 @@
       </div>
     </div>
     <div class="spacer"></div>
-    <div class="pill">
-      <span>🔥</span> <span id="streakText"></span>
+    <div class="actions" id="topbarActions">
+      <div class="pill">
+        <span>🔥</span> <span id="streakText"></span>
+      </div>
+      <button class="ghost" id="homeBtn" aria-label="Forside"><span class="sr-only">Forside</span>🏠</button>
+      <button class="ghost" id="dataBtn" aria-label="Data"><span class="sr-only">Data</span>💾</button>
+      <select id="langSelect" class="ghost">
+        <option value="da">Dansk</option>
+        <option value="en">English</option>
+      </select>
     </div>
-    <button class="ghost" id="homeBtn" aria-label="Forside"><span class="sr-only">Forside</span>🏠</button>
-    <button class="ghost" id="dataBtn" aria-label="Data"><span class="sr-only">Data</span>💾</button>
-    <select id="langSelect" class="ghost">
-      <option value="da">Dansk</option>
-      <option value="en">English</option>
-    </select>
+    <button class="ghost" id="moreBtn" aria-label="Menu" aria-haspopup="true" aria-expanded="false"><span class="sr-only">Menu</span>☰</button>
   </div>
 </header>
 
