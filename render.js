@@ -104,6 +104,7 @@ export function renderHome(state, t, overallProgress) {
           + '<div class="progress-ring" style="--p:' + pctNum + '%"><b>' + pctNum + '%</b></div>'
           + '<div class="notice" style="flex:1;min-width:240px;">' + t("notEmergency") + '</div>'
         + '</div>'
+        // Stress slider for daily distress tracking
         + '<article class="flow"><label for="stressSlider">' + t("stressToday") + '</label><div class="row" style="align-items:center;gap:12px;"><input id="stressSlider" type="range" min="0" max="10" value="5"><span class="chip" id="stressVal">5</span><button class="primary" id="stressSave">' + t("save") + '</button></div></article>'
         + '<article class="flow"><h2>' + t("badgesTitle") + '</h2><div class="badgebar" id="badgeBar">' + badges + '</div></article>'
         + '<article class="flow"><h2>' + t("activityTitle") + '</h2><div class="timeline" id="timeline">' + recent + '</div></article>'
