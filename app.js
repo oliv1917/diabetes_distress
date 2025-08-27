@@ -1,6 +1,14 @@
 import { Store } from './storage.js';
 import { renderTexts, renderSidebar, renderHome, renderData } from './render.js';
 
+export const BADGES = [
+  { th: 0.01, n: "Getting Started" },
+  { th: 0.25, n: "Quarter Way" },
+  { th: 0.5, n: "Halfway Hero" },
+  { th: 0.75, n: "Almost There" },
+  { th: 0.99, n: "Completed 🎉" }
+];
+
 const Lang = {
   en: {
     brandTitle: "Diabetes Distress iCBT",
@@ -319,9 +327,12 @@ function bumpStreak(){
 }
 function awardBadges(){
   let p=overallProgress(state);
-  let set=[{th:.01,n:"Getting Started"},{th:.25,n:"Quarter Way"},{th:.5,n:"Halfway Hero"},{th:.75,n:"Almost There"},{th:.99,n:"Completed 🎉"}];
-  for(let i=0;i<set.length;i++){
-    let b=set[i]; if(p>=b.th && state.badges.indexOf(b.n)===-1){ state.badges.push(b.n); state.timeline.push({t:now(),what:"Badge: "+b.n}); }
+  for(let i=0;i<BADGES.length;i++){
+    let b=BADGES[i];
+    if(p>=b.th && state.badges.indexOf(b.n)===-1){
+      state.badges.push(b.n);
+      state.timeline.push({t:now(),what:"Badge: "+b.n});
+    }
   }
   Store.save(state);
 }
