@@ -441,6 +441,11 @@ function openPage(mi,pi){
     state.timeline.push({t:now(), what:"Completed "+page.title});
     bumpStreak(); awardBadges(); Store.save(state);
     toast(EX[state.lang].completed);
+    if(state.lang === 'da'){
+      toast("Godt gået! Små skridt tæller.");
+    } else {
+      toast("Nice job! Small steps add up.");
+    }
     renderSidebar(state, Lang, navigateTo);
   };
 }
