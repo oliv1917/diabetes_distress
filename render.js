@@ -61,14 +61,13 @@ export function renderHome(state, t, overallProgress) {
     days.push({ key, count: dayCounts[key] || 0 });
   }
   const max = days.reduce((m, d) => Math.max(m, d.count), 0) || 1;
-  const colors = ['#1f2937', '#9be9a8', '#40c463', '#30a14e', '#216e39'];
   const cells = days.map(d => {
-    const lvl = d.count ? Math.ceil((d.count / max) * (colors.length - 1)) : 0;
-    return '<span title="' + d.key + ': ' + d.count + '" style="width:4px;height:4px;border-radius:1px;background:' + colors[lvl] + '"></span>';
+    const lvl = d.count ? Math.ceil((d.count / max) * 4) : 0;
+    return '<span title="' + d.key + ': ' + d.count + '" class="streak-cell level-' + lvl + '"></span>';
   }).join('');
   const streakCount = (state.streak && state.streak.count) || 0;
   const lbl = (state.lang === 'da' ? 'Stime' : 'Streak') + ' ' + streakCount;
-  streakHtml = '<div id="streakText" title="' + lbl + '" aria-label="' + lbl + '"><span style="display:grid;grid-template-rows:repeat(7,4px);grid-auto-flow:column;gap:1px">' + cells + '</span></div>';
+  streakHtml = '<div id="streakText" title="' + lbl + '" aria-label="' + lbl + '"><span class="streak-grid">' + cells + '</span></div>';
 
   const unlocked = new Set(state.badges || []);
   const badges = BADGES.map(b => {
