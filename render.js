@@ -36,9 +36,19 @@ export function renderHome(state, t, overallProgress) {
   const pctNum = Math.round(overallProgress(state) * 100);
   const pages = Object.keys(state.completed).length;
 
-  const badges = state.badges && state.badges.length
-    ? state.badges.map(b => '<span class="chip">🏅 ' + b + '</span>').join('')
-    : '<span class="tiny">' + (state.lang === "da" ? "Ingen mærker endnu — de vises her, når du låser dem op." : "No badges yet — they’ll appear here as you unlock them.") + '</span>';
+  const ALL_BADGES = [
+    'Getting Started',
+    'Quarter Way',
+    'Halfway Hero',
+    'Almost There',
+    'Completed 🎉'
+  ];
+  const unlocked = new Set(state.badges || []);
+  const badges = ALL_BADGES.map(b =>
+    unlocked.has(b)
+      ? '<span class="chip">🏅 ' + b + '</span>'
+      : '<span class="chip locked">' + b + '</span>'
+  ).join('');
 
   const recent = state.timeline && state.timeline.length
     ? state.timeline.slice(-6).reverse().map(ev => {
@@ -55,7 +65,7 @@ export function renderHome(state, t, overallProgress) {
         + '<div class="kpi">'
           + '<div class="tile"><div class="big">' + pctNum + '%</div><div class="tiny">' + t("overall") + '</div></div>'
           + '<div class="tile"><div class="big">' + pages + '</div><div class="tiny">' + t("pagesDone") + '</div></div>'
-          + '<div class="tile"><div class="big">' + (state.badges.slice(-1)[0] || t("none")) + '</div><div class="tiny">' + t("latestBadge") + '</div></div>'
+          + '<div class="tile"><div class="big">' + ((state.badges && state.badges.slice(-1)[0]) || t("none")) + '</div><div class="tiny">' + t("latestBadge") + '</div></div>'
         + '</div>'
         + '<div class="row" style="align-items:center">'
           + '<div class="progress-ring" style="--p:' + pctNum + '%"><b>' + pctNum + '%</b></div>'
