@@ -41,6 +41,7 @@ const Lang = {
     progressTitle: "Your Progress",
     badgesTitle: "Badges",
     activityTitle: "Recent activity",
+    stressToday: "How stressed are you today?",
     none: "—",
 
     modulesData: [
@@ -123,6 +124,7 @@ const Lang = {
     progressTitle: "Dit fremskridt",
     badgesTitle: "Mærker",
     activityTitle: "Seneste aktivitet",
+    stressToday: "Hvor stresset føler du dig i dag?",
     none: "—",
 
     modulesData: [
@@ -181,7 +183,7 @@ let state = Store.load();
 function t(k){ return Lang[state.lang][k]; }
 function todayKey(){ return new Date().toISOString().slice(0,10); }
 function now(){ return new Date().toISOString(); }
-function toast(msg){ let d=document.createElement("div"); d.textContent=msg;
+export function toast(msg){ let d=document.createElement("div"); d.textContent=msg;
   d.style.cssText="position:fixed;bottom:16px;left:50%;transform:translateX(-50%);background:#0b1224;padding:10px 14px;border:1px solid #1f2937;border-radius:10px;color:#e5e7eb;z-index:9999";
   document.body.appendChild(d); setTimeout(function(){ d.remove(); },2000);
 }
@@ -263,7 +265,7 @@ function initTopbarMenu(){
 }
 
 /* Exercise locale strings */
-const EX={
+export const EX={
   en:{add:"Add",save:"Save",delete:"Delete",done:"Done",edit:"Edit",
       distressQ:"Rate your current diabetes distress (0 = none, 10 = max)", bodyQ:"Where do you feel it in your body?", noteQ:"Short note (optional)", viewTrend:"View personal trend", chartHint:"Your saved ratings will show here as a line chart.",
       trigger:"Trigger", typicalThought:"Typical thought", feelingWord:"Feeling (word + 0–10)", noTriggers:"No triggers logged yet.",
