@@ -1,4 +1,5 @@
-import { BADGES } from './app.js';
+import { BADGES, EX, toast } from './app.js';
+import { Store } from './storage.js';
 
 export function renderTexts(state, t) {
   document.getElementById("brandTitle").textContent = t("brandTitle");
@@ -68,10 +69,32 @@ export function renderHome(state, t, overallProgress) {
           + '<div class="progress-ring" style="--p:' + pctNum + '%"><b>' + pctNum + '%</b></div>'
           + '<div class="notice" style="flex:1;min-width:240px;">' + t("notEmergency") + '</div>'
         + '</div>'
+        + '<article class="flow"><label for="stressSlider">' + t("stressToday") + '</label><div class="row" style="align-items:center;gap:12px;"><input id="stressSlider" type="range" min="0" max="10" value="5"><span class="chip" id="stressVal">5</span><button class="primary" id="stressSave">' + t("save") + '</button></div></article>'
         + '<article class="flow"><h2>' + t("badgesTitle") + '</h2><div class="badgebar" id="badgeBar">' + badges + '</div></article>'
         + '<article class="flow"><h2>' + t("activityTitle") + '</h2><div class="timeline" id="timeline">' + recent + '</div></article>'
       + '</section>'
     + '</div>';
+
+  const sliderEl = document.getElementById("stressSlider");
+  const valChip = document.getElementById("stressVal");
+  const saveBtn = document.getElementById("stressSave");
+  if (sliderEl && valChip && saveBtn) {
+    sliderEl.oninput = () => {
+      valChip.textContent = sliderEl.value;
+    };
+    saveBtn.onclick = () => {
+      const rating = +sliderEl.value;
+      const id = 'm1p2';
+      if (!state.exercises) state.exercises = {};
+      if (!state.exercises[id]) state.exercises[id] = {};
+      if (!state.exercises[id].trend) state.exercises[id].trend = [];
+      state.exercises[id].trend.push({ d: new Date().toISOString().slice(0,10), v: rating });
+      if (!state.timeline) state.timeline = [];
+      state.timeline.push({ t: new Date().toISOString(), what: 'Distress ' + rating + '/10' });
+      Store.save(state);
+      toast(EX[state.lang].saved);
+    };
+  }
 }
 export function renderData(state, t) {
   const main = document.getElementById("main");
