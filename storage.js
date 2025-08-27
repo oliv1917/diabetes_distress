@@ -42,3 +42,10 @@ export const Store = {
     localStorage.setItem(this.key, JSON.stringify(clean));
   }
 };
+
+// Keep only the last `max` entries of an array (mutates the array in place)
+export function capArray(arr, max = 30) {
+  if (Array.isArray(arr) && arr.length > max) {
+    arr.splice(0, arr.length - max);
+  }
+}
