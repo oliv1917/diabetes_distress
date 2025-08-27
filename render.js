@@ -44,11 +44,12 @@ export function renderHome(state, t, overallProgress) {
     'Completed 🎉'
   ];
   const unlocked = new Set(state.badges || []);
-  const badges = ALL_BADGES.map(b =>
-    unlocked.has(b)
-      ? '<span class="chip">🏅 ' + b + '</span>'
-      : '<span class="chip locked">' + b + '</span>'
-  ).join('');
+  const badges = ALL_BADGES.map(b => {
+    const isUnlocked = unlocked.has(b);
+    const label = isUnlocked ? '🏅&nbsp;' + b : b;
+    const cls = isUnlocked ? 'chip' : 'chip locked';
+    return '<span class="' + cls + '">' + label + '</span>';
+  }).join('');
 
   const recent = state.timeline && state.timeline.length
     ? state.timeline.slice(-6).reverse().map(ev => {
