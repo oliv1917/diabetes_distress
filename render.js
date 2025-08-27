@@ -1,5 +1,5 @@
 import { BADGES, EX, toast } from './app.js';
-import { Store } from './storage.js';
+import { Store, capArray } from './storage.js';
 
 export function renderTexts(state, t) {
   document.getElementById("brandTitle").textContent = t("brandTitle");
@@ -121,8 +121,10 @@ export function renderHome(state, t, overallProgress) {
       if (!state.exercises[id]) state.exercises[id] = {};
       if (!state.exercises[id].trend) state.exercises[id].trend = [];
       state.exercises[id].trend.push({ d: new Date().toISOString().slice(0,10), v: rating });
+      capArray(state.exercises[id].trend);
       if (!state.timeline) state.timeline = [];
       state.timeline.push({ t: new Date().toISOString(), what: 'Distress ' + rating + '/10' });
+      capArray(state.timeline);
       Store.save(state);
       toast(EX[state.lang].saved);
     };
