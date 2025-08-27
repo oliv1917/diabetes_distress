@@ -233,7 +233,8 @@ function initTopbarMenu(){
   const actions = document.getElementById("topbarActions");
   if(!moreBtn || !actions) return;
 
-  moreBtn.addEventListener("click", () => {
+  moreBtn.addEventListener("click", (e) => {
+    e.stopPropagation();
     const open = actions.classList.toggle("open");
     moreBtn.setAttribute("aria-expanded", open ? "true" : "false");
   });
