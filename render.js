@@ -60,14 +60,14 @@ export function renderHome(state, t, overallProgress) {
     const key = d.toISOString().slice(0, 10);
     days.push({ key, count: dayCounts[key] || 0 });
   }
-  const max = days.reduce((m, d) => Math.max(m, d.count), 0) || 1;
+  const max = days.reduce((m, d) => Math.max(m, d.count), 0);
   const cells = days.map(d => {
-    const lvl = d.count ? Math.ceil((d.count / max) * 4) : 0;
+    const lvl = d.count ? Math.ceil((d.count / (max || 1)) * 4) : 0;
     return '<span title="' + d.key + ': ' + d.count + '" class="streak-cell level-' + lvl + '"></span>';
   }).join('');
   const streakCount = (state.streak && state.streak.count) || 0;
   const lbl = (state.lang === 'da' ? 'Stime' : 'Streak') + ' ' + streakCount;
-  streakHtml = '<div id="streakText" title="' + lbl + '" aria-label="' + lbl + '"><span class="streak-grid">' + cells + '</span></div>';
+  streakHtml = '<div id="streakText" title="' + lbl + '" aria-label="' + lbl + '"><span class="streak-grid"></span></div>';
 
   const unlocked = new Set(state.badges || []);
   const badges = BADGES.map(b => {
@@ -106,6 +106,20 @@ export function renderHome(state, t, overallProgress) {
         + '<article class="flow"><h2>' + t("activityTitle") + '</h2><div class="timeline" id="timeline">' + recent + '</div></article>'
       + '</section>'
     + '</div>';
+
+  const heatmapEl = document.querySelector('#streakText .streak-grid');
+  if (heatmapEl) {
+    if (max === 0) {
+      heatmapEl.textContent = t('noStreakData');
+      const parent = document.getElementById('streakText');
+      if (parent) {
+        parent.setAttribute('aria-label', t('noStreakData'));
+        parent.setAttribute('title', t('noStreakData'));
+      }
+    } else {
+      heatmapEl.innerHTML = cells;
+    }
+  }
 
   const sliderEl = document.getElementById("stressSlider");
   const valChip = document.getElementById("stressVal");

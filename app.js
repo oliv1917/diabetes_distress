@@ -42,6 +42,7 @@ const Lang = {
     activityTitle: "Recent activity",
     stressToday: "How stressed are you today?",
     none: "—",
+    noStreakData: "No streak data",
 
     modulesData: [
       { id:"m1", title:"1) Orientation", goal:"Get comfortable with how the program works.", pages:[
@@ -124,6 +125,7 @@ const Lang = {
     activityTitle: "Seneste aktivitet",
     stressToday: "Hvor stresset føler du dig i dag?",
     none: "—",
+    noStreakData: "Ingen stime-data",
 
     modulesData: [
       { id:"m1", title:"1) Introduktion", goal:"Bliv fortrolig med, hvordan programmet fungerer.", pages:[
