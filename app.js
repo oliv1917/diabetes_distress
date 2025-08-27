@@ -355,8 +355,16 @@ function openPage(mi,pi){
   let mod=Lang[state.lang].modulesData[mi]; if(!mod) return;
   let page=mod.pages[pi]; if(!page) return;
   let main=document.getElementById("main");
+  const total = mod.pages.length;
+  const current = pi + 1;
+  const percent = (current / total) * 100;
+  const mini = '<div class="mini-progress">'
+                +'<div class="bar"><i style="width:' + percent + '%"></i></div>'
+                +'<span class="txt">Page ' + current + ' of ' + total + '</span>'
+              +'</div>';
   main.innerHTML='<div class="page">'
     +'<div class="hero"><h1>'+mod.title+'</h1><div class="meta"><span>'+mod.goal+'</span></div></div>'
+    + mini
     +'<section class="content" id="content"></section>'
     +'<div class="cta-row" style="padding:0 18px 18px">'
       +'<button id="prevBtn" '+(pi===0?'disabled':'')+'>'+t("prev")+'</button>'
