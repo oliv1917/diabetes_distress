@@ -5,7 +5,6 @@ export function renderTexts(state, t) {
   document.getElementById("brandTitle").textContent = t("brandTitle");
   document.getElementById("brandSubtitle").textContent = t("brandSubtitle");
   document.getElementById("modulesTitle").textContent = t("modules");
-  document.getElementById("streakText").textContent = t("streak") + " " + (state.streak.count || 0);
   document.getElementById("footerText").textContent = t("footer").replace("YEAR", new Date().getFullYear());
   const homeBtn = document.getElementById("homeBtn");
   homeBtn.setAttribute("aria-label", t("home"));
@@ -40,39 +39,36 @@ export function renderHome(state, t, overallProgress) {
   const pages = Object.keys(state.completed).length;
 
   // ==== Streak heatmap (last 30 days) ====
-  const streakEl = document.getElementById("streakText");
-  if (streakEl) {
-    const dayCounts = {};
-    if (state.timeline) {
-      state.timeline.forEach(ev => {
-        const key = ev.t.slice(0, 10);
-        dayCounts[key] = (dayCounts[key] || 0) + 1;
-      });
-    }
-    if (state.streak && state.streak.last) {
-      const k = state.streak.last;
-      dayCounts[k] = Math.max(dayCounts[k] || 0, 1);
-    }
-
-    const days = [];
-    const today = new Date();
-    for (let i = 29; i >= 0; i--) {
-      const d = new Date(today);
-      d.setDate(today.getDate() - i);
-      const key = d.toISOString().slice(0, 10);
-      days.push({ key, count: dayCounts[key] || 0 });
-    }
-    const max = days.reduce((m, d) => Math.max(m, d.count), 0) || 1;
-    const colors = ['#1f2937', '#9be9a8', '#40c463', '#30a14e', '#216e39'];
-    const cells = days.map(d => {
-      const lvl = d.count ? Math.ceil((d.count / max) * (colors.length - 1)) : 0;
-      return '<span title="' + d.key + ': ' + d.count + '" style="width:4px;height:4px;border-radius:1px;background:' + colors[lvl] + '"></span>';
-    }).join('');
-    streakEl.innerHTML = '<span style="display:grid;grid-template-rows:repeat(7,4px);grid-auto-flow:column;gap:1px">' + cells + '</span>';
-    const lbl = t("streak") + ' ' + (state.streak.count || 0);
-    streakEl.setAttribute('title', lbl);
-    streakEl.setAttribute('aria-label', lbl);
+  let streakHtml = '';
+  const dayCounts = {};
+  if (state.timeline) {
+    state.timeline.forEach(ev => {
+      const key = ev.t.slice(0, 10);
+      dayCounts[key] = (dayCounts[key] || 0) + 1;
+    });
   }
+  if (state.streak && state.streak.last) {
+    const k = state.streak.last;
+    dayCounts[k] = Math.max(dayCounts[k] || 0, 1);
+  }
+
+  const days = [];
+  const today = new Date();
+  for (let i = 29; i >= 0; i--) {
+    const d = new Date(today);
+    d.setDate(today.getDate() - i);
+    const key = d.toISOString().slice(0, 10);
+    days.push({ key, count: dayCounts[key] || 0 });
+  }
+  const max = days.reduce((m, d) => Math.max(m, d.count), 0) || 1;
+  const colors = ['#1f2937', '#9be9a8', '#40c463', '#30a14e', '#216e39'];
+  const cells = days.map(d => {
+    const lvl = d.count ? Math.ceil((d.count / max) * (colors.length - 1)) : 0;
+    return '<span title="' + d.key + ': ' + d.count + '" style="width:4px;height:4px;border-radius:1px;background:' + colors[lvl] + '"></span>';
+  }).join('');
+  const streakCount = (state.streak && state.streak.count) || 0;
+  const lbl = (state.lang === 'da' ? 'Stime' : 'Streak') + ' ' + streakCount;
+  streakHtml = '<div id="streakText" title="' + lbl + '" aria-label="' + lbl + '"><span style="display:grid;grid-template-rows:repeat(7,4px);grid-auto-flow:column;gap:1px">' + cells + '</span></div>';
 
   const unlocked = new Set(state.badges || []);
   const badges = BADGES.map(b => {
@@ -95,6 +91,7 @@ export function renderHome(state, t, overallProgress) {
     + '<div class="page">'
       + '<div class="hero"><h1>' + t("welcome") + '</h1><p class="muted">' + t("subtitle") + '</p></div>'
       + '<section class="content">'
+        + streakHtml
         + '<div class="kpi">'
           + '<div class="tile"><div class="big">' + pctNum + '%</div><div class="tiny">' + t("overall") + '</div></div>'
           + '<div class="tile"><div class="big">' + pages + '</div><div class="tiny">' + t("pagesDone") + '</div></div>'
