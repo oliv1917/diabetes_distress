@@ -269,6 +269,16 @@ const EX={
       earlySign:"Early warning sign", support:"Support person / service", step:"Coping step", noSigns:"No signs yet.", noSupports:"No supports yet.", noSteps:"No steps yet.",
       context:"Context", observation:"Observation", preference:"Preference (ask)", enlist:"Enlist", preview:"Script preview",
       risk:"Risk situation", addPair:"Add Pair", ifCue:"If (cue)", thenAct:"Then (action)", noRisks:"No risks yet.", noPairs:"No pairs yet.",
+      drBodyExample:"tight chest", drNoteExample:"after tough call",
+      tgNameExample:"before meals", tgThoughtExample:"I'm failing at this", tgFeelExample:"anxious",
+      trSitExample:"missed medication", trThoughtExample:"I can't manage", trEvidenceExample:"I usually remember", trAltExample:"Everyone slips up",
+      rfOrigExample:"I'm out of control", rfNewExample:"One high number isn't failure",
+      psProbExample:"late insulin doses", psOptExample:"set phone alarm", psWhenExample:"after dinner", psWhereExample:"kitchen table", psHowExample:"prepare kit beforehand",
+      apTaskExample:"walk 10 minutes", apWhenExample:"7 pm",
+      vsActionExample:"call a friend",
+      cpSigExample:"skipping checks", cpSupExample:"partner", cpStepExample:"slow breathing",
+      csCtxExample:"at appointments", csObsExample:"you arrive late", csPrefExample:"I prefer 5 min notice", csEnExample:"can we plan ahead?",
+      rpRiskExample:"travel days", rpIfExample:"if overwhelmed", rpThenExample:"take a break",
       saved:"Saved ✔️", completed:"Marked as complete ✔️"},
   da:{add:"Tilføj",save:"Gem",delete:"Slet",done:"Færdig",edit:"Redigér",
       distressQ:"Vurdér din nuværende diabetes-stress (0 = ingen, 10 = maks.)", bodyQ:"Hvor mærker du det i kroppen?", noteQ:"Kort note (valgfrit)", viewTrend:"Se personlig udvikling", chartHint:"Dine gemte vurderinger vises her som en linjegraf.",
@@ -283,6 +293,16 @@ const EX={
       earlySign:"Tidligt faresignal", support:"Støtteperson / tilbud", step:"Mestringsskridt", noSigns:"Ingen tegn endnu.", noSupports:"Ingen støtter endnu.", noSteps:"Ingen skridt endnu.",
       context:"Kontekst", observation:"Observation", preference:"Præference (ønske)", enlist:"Engagér", preview:"Forhåndsvisning af manuskript",
       risk:"Risikosituation", addPair:"Tilføj par", ifCue:"Hvis (cue)", thenAct:"Så (handling)", noRisks:"Ingen risici endnu.", noPairs:"Ingen par endnu.",
+      drBodyExample:"stram brystkasse", drNoteExample:"efter svær samtale",
+      tgNameExample:"før måltider", tgThoughtExample:"jeg klarer det ikke", tgFeelExample:"bekymret",
+      trSitExample:"glemte medicin", trThoughtExample:"jeg kan ikke håndtere det", trEvidenceExample:"jeg husker det normalt", trAltExample:"alle laver fejl",
+      rfOrigExample:"jeg er uden kontrol", rfNewExample:"en høj måling er ikke fiasko",
+      psProbExample:"forsinkede insulin-doser", psOptExample:"sæt telefonalarm", psWhenExample:"efter aftensmad", psWhereExample:"ved køkkenbordet", psHowExample:"forbered udstyr på forhånd",
+      apTaskExample:"gå 10 minutter", apWhenExample:"kl. 19",
+      vsActionExample:"ring til en ven",
+      cpSigExample:"springer målinger over", cpSupExample:"partner", cpStepExample:"rolig vejrtrækning",
+      csCtxExample:"ved aftaler", csObsExample:"du kommer for sent", csPrefExample:"jeg vil have 5 min varsel", csEnExample:"kan vi planlægge?",
+      rpRiskExample:"rejsedage", rpIfExample:"hvis overvældet", rpThenExample:"tag en pause",
       saved:"Gemt ✔️", completed:"Markéret som færdig ✔️"}
 };
 function te(k){ return EX[state.lang][k]; }
@@ -429,8 +449,8 @@ function renderExercise(root, page){
     root.innerHTML=DOMPurify.sanitize('<div class="exercise"><h2>'+page.title+'</h2>'
       +'<div class="row"><label class="field"><span>'+te("distressQ")+'</span>'
         +'<input type="range" min="0" max="10" value="'+last+'" id="drRange"><div class="row"><span class="chip" id="drVal">'+last+'</span></div></label>'
-        +'<label class="field"><span>'+te("bodyQ")+'</span><input type="text" id="drBody" value="'+prevBody+'"></label></div>'
-      +'<label class="field"><span>'+te("noteQ")+'</span><textarea id="drNote" rows="3">'+prevNote+'</textarea></label>'
+        +'<label class="field"><span>'+te("bodyQ")+'</span><input type="text" id="drBody" value="'+prevBody+'" placeholder="'+te("drBodyExample")+'"></label></div>'
+      +'<label class="field"><span>'+te("noteQ")+'</span><textarea id="drNote" rows="3" placeholder="'+te("drNoteExample")+'">'+prevNote+'</textarea></label>'
       +'<div class="cta-row"><button class="primary" id="drSave">'+t("save")+'</button><button id="drTrend">'+te("viewTrend")+'</button></div>'
       +'<canvas id="miniChart" width="600" height="160" style="width:100%;max-width:100%"></canvas></div>');
     let range=document.getElementById("drRange"), val=document.getElementById("drVal");
@@ -464,9 +484,9 @@ function renderExercise(root, page){
   if(kind==="trigger-log"){
     let items=(state.exercises[id]&&state.exercises[id].items)?state.exercises[id].items:[];
     root.innerHTML='<div class="exercise"><h2>'+page.title+'</h2>'
-      +'<div class="row"><label class="field"><span>'+te("trigger")+'</span><input id="tgName" type="text"></label>'
-      +'<label class="field"><span>'+te("typicalThought")+'</span><input id="tgThought" type="text"></label>'
-      +'<label class="field"><span>'+te("feelingWord")+'</span><input id="tgFeel" type="text"></label>'
+      +'<div class="row"><label class="field"><span>'+te("trigger")+'</span><input id="tgName" type="text" placeholder="'+te("tgNameExample")+'"></label>'
+      +'<label class="field"><span>'+te("typicalThought")+'</span><input id="tgThought" type="text" placeholder="'+te("tgThoughtExample")+'"></label>'
+      +'<label class="field"><span>'+te("feelingWord")+'</span><input id="tgFeel" type="text" placeholder="'+te("tgFeelExample")+'"></label>'
       +'<button class="primary" id="tgAdd">'+t("add")+'</button></div><div class="list" id="tgList"></div></div>';
     function paint(){
       let list=document.getElementById("tgList"); list.innerHTML=items.length?"":"<div class='tiny'>"+te("noTriggers")+"</div>";
@@ -504,11 +524,11 @@ function renderExercise(root, page){
   if(kind==="thought-record"){
     let rows=(state.exercises[id]&&state.exercises[id].rows)?state.exercises[id].rows:[];
     root.innerHTML='<div class="exercise"><h2>'+page.title+'</h2>'
-      +'<div class="row"><label class="field"><span>'+te("situation")+'</span><input id="trSit" type="text"></label>'
-      +'<label class="field"><span>'+te("autoThought")+'</span><input id="trThought" type="text"></label>'
+      +'<div class="row"><label class="field"><span>'+te("situation")+'</span><input id="trSit" type="text" placeholder="'+te("trSitExample")+'"></label>'
+      +'<label class="field"><span>'+te("autoThought")+'</span><input id="trThought" type="text" placeholder="'+te("trThoughtExample")+'"></label>'
       +'<label class="field"><span>'+te("feelingNum")+'</span><input id="trFeeling" type="number" min="0" max="10" value="6"></label></div>'
-      +'<label class="field"><span>'+te("evidence")+'</span><textarea id="trEvidence" rows="3"></textarea></label>'
-      +'<label class="field"><span>'+te("altThought")+'</span><input id="trAlt" type="text"></label>'
+      +'<label class="field"><span>'+te("evidence")+'</span><textarea id="trEvidence" rows="3" placeholder="'+te("trEvidenceExample")+'"></textarea></label>'
+      +'<label class="field"><span>'+te("altThought")+'</span><input id="trAlt" type="text" placeholder="'+te("trAltExample")+'"></label>'
       +'<div class="cta-row"><button class="primary" id="trAdd">'+te("addRow")+'</button></div>'
       +'<div class="list" id="trList"></div></div>';
     function paint(){
@@ -568,8 +588,8 @@ function renderExercise(root, page){
     root.innerHTML='<div class="exercise"><h2>'+page.title+'</h2><p class="tiny">'+te("reframePick")+'</p>'
       +'<div class="flex"><div class="grow"><h3>'+te("thoughts")+'</h3><div id="cards" class="flex" style="min-height:80px;gap:8px;flex-wrap:wrap"></div></div>'
       +'<div class="grow"><h3>'+te("buckets")+'</h3><div class="grid" style="display:grid;gap:10px;grid-template-columns:repeat(2,1fr)">'+distortions.map(function(d){return '<div class="dnd-bucket" data-k="'+d.k+'" tabindex="0"><strong>'+d.label+'</strong><div class="tiny">'+te("dropHere")+'</div><div class="bucket"></div></div>';}).join('')+'</div></div></div>'
-      +'<label class="field"><span>'+te("origThought")+'</span><input id="rfOrig" type="text"></label>'
-      +'<label class="field"><span>'+te("balanced")+'</span><input id="rfNew" type="text" placeholder="It’s one data point; I can adjust."></label>'
+      +'<label class="field"><span>'+te("origThought")+'</span><input id="rfOrig" type="text" placeholder="'+te("rfOrigExample")+'"></label>'
+      +'<label class="field"><span>'+te("balanced")+'</span><input id="rfNew" type="text" placeholder="'+te("rfNewExample")+'"></label>'
       +'<div class="cta-row"><button class="primary" id="rfSave">'+t("save")+'</button></div></div>';
     let cards=document.getElementById("cards"); examples.forEach(function(ex){ let c=document.createElement('span'); c.className="tag drag"; c.textContent=ex.text; c.draggable=true; c.dataset.k=ex.k; c.addEventListener('dragstart',function(e){ e.dataTransfer.setData('text/plain', JSON.stringify(ex)); }); cards.appendChild(c); });
     let buckets=document.querySelectorAll(".dnd-bucket");
@@ -594,12 +614,12 @@ function renderExercise(root, page){
     let data=state.exercises[id]?state.exercises[id]:{problem:"",options:[],chosen:[],plan:{when:"",where:"",how:""}};
     if(!data.options) data.options=[]; if(!data.chosen) data.chosen=[]; if(!data.plan) data.plan={when:"",where:"",how:""};
     root.innerHTML=DOMPurify.sanitize('<div class="exercise"><h2>'+page.title+'</h2>'
-      +'<label class="field"><span>'+te("defineProblem")+'</span><input id="psProb" type="text" value="'+(data.problem||'')+'"></label>'
-      +'<div class="row"><label class="field"><span>'+te("option")+'</span><input id="psOpt" type="text"></label><button class="primary" id="psAdd">'+te("addOption")+'</button></div>'
+      +'<label class="field"><span>'+te("defineProblem")+'</span><input id="psProb" type="text" value="'+(data.problem||'')+'" placeholder="'+te("psProbExample")+'"></label>'
+      +'<div class="row"><label class="field"><span>'+te("option")+'</span><input id="psOpt" type="text" placeholder="'+te("psOptExample")+'"></label><button class="primary" id="psAdd">'+te("addOption")+'</button></div>'
       +'<div id="psOptions" class="badgebar"></div>'
-      +'<div class="row"><label class="field"><span>'+te("when")+'</span><input id="psWhen" type="text" value="'+(data.plan.when||'')+'"></label>'
-      +'<label class="field"><span>'+te("where")+'</span><input id="psWhere" type="text" value="'+(data.plan.where||'')+'"></label>'
-      +'<label class="field"><span>'+te("how")+'</span><input id="psHow" type="text" value="'+(data.plan.how||'')+'"></label></div>'
+      +'<div class="row"><label class="field"><span>'+te("when")+'</span><input id="psWhen" type="text" value="'+(data.plan.when||'')+'" placeholder="'+te("psWhenExample")+'"></label>'
+      +'<label class="field"><span>'+te("where")+'</span><input id="psWhere" type="text" value="'+(data.plan.where||'')+'" placeholder="'+te("psWhereExample")+'"></label>'
+      +'<label class="field"><span>'+te("how")+'</span><input id="psHow" type="text" value="'+(data.plan.how||'')+'" placeholder="'+te("psHowExample")+'"></label></div>'
       +'<div class="cta-row"><button class="primary" id="psSave">'+te("savePlan")+'</button></div></div>');
     let chosen=(function(arr){let s=new Set(); for(let i=0;i<arr.length;i++) s.add(arr[i]); return s;})(data.chosen||[]);
     function renderOptions(){ let cont=document.getElementById("psOptions"); cont.innerHTML=data.options.length?"":"<span class=\"tiny\">"+te("selectHint")+"</span>";
@@ -617,9 +637,9 @@ function renderExercise(root, page){
     let acts=(state.exercises[id]&&state.exercises[id].acts)?state.exercises[id].acts:[];
     root.innerHTML='<div class="exercise"><h2>'+page.title+'</h2>'
       +'<p class="tiny">'+(state.lang==="da"?"Planlæg 2–3 små handlinger de næste 48 timer. Hold dem små.":"Plan 2–3 small actions for the next 48 hours. Keep them tiny.")+'</p>'
-      +'<div class="row"><label class="field"><span>'+te("action")+'</span><input id="apTask" type="text"></label>'
+      +'<div class="row"><label class="field"><span>'+te("action")+'</span><input id="apTask" type="text" placeholder="'+te("apTaskExample")+'"></label>'
       +'<label class="field"><span>'+te("energy")+'</span><input id="apCost" type="number" min="1" max="5" value="2"></label>'
-      +'<label class="field"><span>'+te("whenTime")+'</span><input id="apWhen" type="text"></label>'
+      +'<label class="field"><span>'+te("whenTime")+'</span><input id="apWhen" type="text" placeholder="'+te("apWhenExample")+'"></label>'
       +'<button class="primary" id="apAdd">'+t("add")+'</button></div>'
       +'<div class="list" id="apList"></div></div>';
     function paint(){ let list=document.getElementById("apList"); list.innerHTML=acts.length?"":"<div class=\"tiny\">"+te("noActions")+"</div>";
@@ -670,7 +690,7 @@ function renderExercise(root, page){
     let chosen=(state.exercises[id]&&state.exercises[id].top)?state.exercises[id].top.slice():[];
     root.innerHTML='<div class="exercise"><h2>'+page.title+'</h2><p class="tiny">'+te("pickValues")+'</p>'
       +'<div class="badgebar" id="vsPool"></div><div class="badgebar" id="vsTop"></div>'
-      +'<label class="field"><span>'+te("oneAction")+'</span><input id="vsAction" type="text"></label><div class="cta-row"><button class="primary" id="vsSave">'+t("save")+'</button></div></div>';
+      +'<label class="field"><span>'+te("oneAction")+'</span><input id="vsAction" type="text" placeholder="'+te("vsActionExample")+'"></label><div class="cta-row"><button class="primary" id="vsSave">'+t("save")+'</button></div></div>';
     function renderPool(){ let poolEl=document.getElementById("vsPool"); poolEl.innerHTML=pool.map(function(v){return '<span class="chip">'+v+'</span>';}).join('');
       let chips=poolEl.querySelectorAll('.chip'); for(let i=0;i<chips.length;i++){ (function(ch){ ch.onclick=function(){ if(chosen.indexOf(ch.textContent)===-1){ chosen.push(ch.textContent); renderTop(); } }; })(chips[i]); } }
     function renderTop(){
@@ -718,9 +738,9 @@ function renderExercise(root, page){
   if(kind==="coping-plan"){
     let cp=state.exercises[id]?state.exercises[id]:{signals:[],supports:[],list:[]}; if(!cp.signals) cp.signals=[]; if(!cp.supports) cp.supports=[]; if(!cp.list) cp.list=[];
     root.innerHTML=DOMPurify.sanitize('<div class="exercise"><h2>'+page.title+'</h2>'
-      +'<div class="row"><label class="field"><span>'+te("earlySign")+'</span><input id="cpSig" type="text"></label><button class="primary" id="cpAddSig">'+t("add")+'</button></div><div class="badgebar" id="cpSigList"></div>'
-      +'<div class="row"><label class="field"><span>'+te("support")+'</span><input id="cpSup" type="text"></label><button class="primary" id="cpAddSup">'+t("add")+'</button></div><div class="badgebar" id="cpSupList"></div>'
-      +'<div class="row"><label class="field"><span>'+te("step")+'</span><input id="cpStep" type="text"></label><button class="primary" id="cpAddStep">'+t("add")+'</button></div><div class="list" id="cpSteps"></div>'
+      +'<div class="row"><label class="field"><span>'+te("earlySign")+'</span><input id="cpSig" type="text" placeholder="'+te("cpSigExample")+'"></label><button class="primary" id="cpAddSig">'+t("add")+'</button></div><div class="badgebar" id="cpSigList"></div>'
+      +'<div class="row"><label class="field"><span>'+te("support")+'</span><input id="cpSup" type="text" placeholder="'+te("cpSupExample")+'"></label><button class="primary" id="cpAddSup">'+t("add")+'</button></div><div class="badgebar" id="cpSupList"></div>'
+      +'<div class="row"><label class="field"><span>'+te("step")+'</span><input id="cpStep" type="text" placeholder="'+te("cpStepExample")+'"></label><button class="primary" id="cpAddStep">'+t("add")+'</button></div><div class="list" id="cpSteps"></div>'
       +'<div class="cta-row"><button class="primary" id="cpSave">'+t("save")+'</button></div></div>');
     function paint(){
       let sigList=document.getElementById("cpSigList");
@@ -746,10 +766,10 @@ function renderExercise(root, page){
   if(kind==="care-script"){
     let data=state.exercises[id]?state.exercises[id]:{context:"",observation:"",preference:"",enlist:""};
     root.innerHTML=DOMPurify.sanitize('<div class="exercise"><h2>'+page.title+'</h2>'
-      +'<div class="row"><label class="field"><span>'+te("context")+'</span><input id="csCtx" type="text" value="'+(data.context||'')+'"></label>'
-      +'<label class="field"><span>'+te("observation")+'</span><input id="csObs" type="text" value="'+(data.observation||'')+'"></label></div>'
-      +'<div class="row"><label class="field"><span>'+te("preference")+'</span><input id="csPref" type="text" value="'+(data.preference||'')+'"></label>'
-      +'<label class="field"><span>'+te("enlist")+'</span><input id="csEn" type="text" value="'+(data.enlist||'')+'"></label></div>'
+      +'<div class="row"><label class="field"><span>'+te("context")+'</span><input id="csCtx" type="text" value="'+(data.context||'')+'" placeholder="'+te("csCtxExample")+'"></label>'
+      +'<label class="field"><span>'+te("observation")+'</span><input id="csObs" type="text" value="'+(data.observation||'')+'" placeholder="'+te("csObsExample")+'"></label></div>'
+      +'<div class="row"><label class="field"><span>'+te("preference")+'</span><input id="csPref" type="text" value="'+(data.preference||'')+'" placeholder="'+te("csPrefExample")+'"></label>'
+      +'<label class="field"><span>'+te("enlist")+'</span><input id="csEn" type="text" value="'+(data.enlist||'')+'" placeholder="'+te("csEnExample")+'"></label></div>'
       +'<div class="notice"><strong>'+te("preview")+'</strong><div id="csPreview" class="tiny"></div></div>'
       +'<div class="cta-row"><button class="primary" id="csSave">'+t("save")+'</button></div></div>');
     function preview(){ let ctx=(document.getElementById("csCtx").value||'—'), obs=(document.getElementById("csObs").value||'—'), pref=(document.getElementById("csPref").value||'—'), en=(document.getElementById("csEn").value||'—');
@@ -763,8 +783,8 @@ function renderExercise(root, page){
   if(kind==="relapse-plan"){
     let data=state.exercises[id]?state.exercises[id]:{risks:[],ifThen:[]}; if(!data.risks) data.risks=[]; if(!data.ifThen) data.ifThen=[];
     root.innerHTML=DOMPurify.sanitize('<div class="exercise"><h2>'+page.title+'</h2>'
-      +'<div class="row"><label class="field"><span>'+te("risk")+'</span><input id="rpRisk" type="text"></label><button class="primary" id="rpAddRisk">'+t("add")+'</button></div><div class="badgebar" id="rpRisks"></div>'
-      +'<div class="row"><label class="field"><span>'+te("ifCue")+'</span><input id="rpIf" type="text"></label><label class="field"><span>'+te("thenAct")+'</span><input id="rpThen" type="text"></label><button class="primary" id="rpAddPair">'+te("addPair")+'</button></div><div class="list" id="rpPairs"></div></div>');
+      +'<div class="row"><label class="field"><span>'+te("risk")+'</span><input id="rpRisk" type="text" placeholder="'+te("rpRiskExample")+'"></label><button class="primary" id="rpAddRisk">'+t("add")+'</button></div><div class="badgebar" id="rpRisks"></div>'
+      +'<div class="row"><label class="field"><span>'+te("ifCue")+'</span><input id="rpIf" type="text" placeholder="'+te("rpIfExample")+'"></label><label class="field"><span>'+te("thenAct")+'</span><input id="rpThen" type="text" placeholder="'+te("rpThenExample")+'"></label><button class="primary" id="rpAddPair">'+te("addPair")+'</button></div><div class="list" id="rpPairs"></div></div>');
     function paint(){
       let riskList=document.getElementById("rpRisks");
       riskList.textContent="";
