@@ -1,4 +1,4 @@
-import { BADGES, EX, toast } from './app.js';
+import { BADGES, EX, toast, logEvent } from './app.js';
 import { Store, capArray } from './storage.js';
 
 export function renderTexts(state, t) {
@@ -46,10 +46,6 @@ export function renderHome(state, t, overallProgress) {
       const key = ev.t.slice(0, 10);
       dayCounts[key] = (dayCounts[key] || 0) + 1;
     });
-  }
-  if (state.streak && state.streak.last) {
-    const k = state.streak.last;
-    dayCounts[k] = Math.max(dayCounts[k] || 0, 1);
   }
 
   const days = [];
@@ -136,9 +132,7 @@ export function renderHome(state, t, overallProgress) {
       if (!state.exercises[id].trend) state.exercises[id].trend = [];
       state.exercises[id].trend.push({ d: new Date().toISOString().slice(0,10), v: rating });
       capArray(state.exercises[id].trend);
-      if (!state.timeline) state.timeline = [];
-      state.timeline.push({ t: new Date().toISOString(), what: 'Distress ' + rating + '/10' });
-      capArray(state.timeline);
+      logEvent('Distress ' + rating + '/10');
       Store.save(state);
       toast(EX[state.lang].saved);
     };

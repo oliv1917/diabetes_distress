@@ -1,4 +1,4 @@
-import { Store } from './storage.js';
+import { Store, capArray } from './storage.js';
 import { renderTexts, renderSidebar, renderHome, renderData } from './render.js';
 
 export const BADGES = [
@@ -317,14 +317,19 @@ export const EX={
 };
 function te(k){ return EX[state.lang][k]; }
 
-/* ========== Streaks & Badges ========== */
-function bumpStreak(){
-  let d=todayKey();
-  if(state.streak.last!==d){
-    let y=new Date(); y.setDate(y.getDate()-1);
-    let yKey=y.toISOString().slice(0,10);
+/* ========== Timeline, Streaks & Badges ========== */
+export function logEvent(what){
+  if(!state.timeline) state.timeline=[];
+  const ts=now();
+  state.timeline.push({t:ts, what});
+  capArray(state.timeline);
+  if(!state.streak) state.streak={last:null,count:0};
+  const day=ts.slice(0,10);
+  if(state.streak.last!==day){
+    const y=new Date(ts); y.setDate(y.getDate()-1);
+    const yKey=y.toISOString().slice(0,10);
     state.streak.count=(state.streak.last===yKey)?(state.streak.count||0)+1:1;
-    state.streak.last=d; Store.save(state);
+    state.streak.last=day;
   }
 }
 function awardBadges(){
@@ -333,7 +338,7 @@ function awardBadges(){
     let b=BADGES[i];
     if(p>=b.th && state.badges.indexOf(b.n)===-1){
       state.badges.push(b.n);
-      state.timeline.push({t:now(),what:"Badge: "+b.n});
+      logEvent("Badge: "+b.n);
     }
   }
   Store.save(state);
@@ -440,8 +445,8 @@ function openPage(mi,pi){
   let markBtn=document.getElementById("markBtn");
   if(markBtn) markBtn.onclick=function(){
     state.completed[page.id]=true;
-    state.timeline.push({t:now(), what:"Completed "+page.title});
-    bumpStreak(); awardBadges(); Store.save(state);
+    logEvent("Completed "+page.title);
+    awardBadges(); Store.save(state);
     toast(EX[state.lang].completed);
     if(state.lang === 'da'){
       toast("Godt gået! Små skridt tæller.");
@@ -492,7 +497,7 @@ function renderExercise(root, page){
       let trend=(state.exercises[id]&&state.exercises[id].trend)?state.exercises[id].trend:[];
       trend.push({d:todayKey(), v:clamp(rating,0,10)});
       save({rating:rating, body:body, note:note, trend:trend});
-      state.timeline.push({t:now(), what:"Distress "+rating+"/10"}); awardBadges(); Store.save(state);
+      logEvent("Distress "+rating+"/10"); awardBadges(); Store.save(state);
       toast(EX[state.lang].saved); draw();
     };
     document.getElementById("drTrend").onclick=draw; draw();
@@ -623,7 +628,7 @@ function renderExercise(root, page){
       let orig=document.getElementById("rfOrig").value.trim(), neu=document.getElementById("rfNew").value.trim();
       if(!orig||!neu){ toast(te("origThought")+" + "+te("balanced")); return; }
       if(!state.exercises[id]) state.exercises[id]={}; state.exercises[id].reframe={orig:orig,neu:neu};
-      state.timeline.push({t:now(),what:"Saved reframe"}); awardBadges(); Store.save(state); toast(EX[state.lang].saved);
+      logEvent("Saved reframe"); awardBadges(); Store.save(state); toast(EX[state.lang].saved);
     };
   }
 
@@ -646,7 +651,7 @@ function renderExercise(root, page){
     document.getElementById("psAdd").onclick=function(){ let v=document.getElementById("psOpt").value.trim(); if(!v) return; data.options.push(v); document.getElementById("psOpt").value=""; state.exercises[id]=data; Store.save(state); renderOptions(); };
     document.getElementById("psSave").onclick=function(){ data.problem=document.getElementById("psProb").value.trim();
       data.plan={when:document.getElementById("psWhen").value.trim(), where:document.getElementById("psWhere").value.trim(), how:document.getElementById("psHow").value.trim()};
-      data.chosen=Array.from(chosen); state.exercises[id]=data; state.timeline.push({t:now(),what:"Saved problem plan"}); awardBadges(); Store.save(state); toast(EX[state.lang].saved); };
+      data.chosen=Array.from(chosen); state.exercises[id]=data; logEvent("Saved problem plan"); awardBadges(); Store.save(state); toast(EX[state.lang].saved); };
     renderOptions();
   }
 
@@ -736,7 +741,7 @@ function renderExercise(root, page){
       for(let i=0;i<btns.length;i++){ (function(b){ b.onclick=function(){ if(confirm(t("confirmDelete"))){ let idx=+b.getAttribute('data-i'); chosen.splice(idx,1); renderTop(); } }; })(btns[i]); }
     }
     document.getElementById("vsSave").onclick=function(){ let action=document.getElementById("vsAction").value.trim(); state.exercises[id]={top:chosen.slice(), action:action};
-      state.timeline.push({t:now(),what:"Saved values"}); awardBadges(); Store.save(state); toast(EX[state.lang].saved); };
+      logEvent("Saved values"); awardBadges(); Store.save(state); toast(EX[state.lang].saved); };
     renderPool(); renderTop();
   }
 
@@ -748,7 +753,7 @@ function renderExercise(root, page){
     document.getElementById("brStart").onclick=function(){
       let secs=60; let rem=document.getElementById("brRemain"); rem.textContent="60"+te("seconds");
       let id=setInterval(function(){ secs--; rem.textContent=secs+te("seconds");
-        if(secs<=0){ clearInterval(id); rem.textContent=state.lang==="da"?"Færdig ✔️":"Done ✔️"; state.timeline.push({t:now(),what:"Breathing done"}); awardBadges(); Store.save(state); } },1000);
+        if(secs<=0){ clearInterval(id); rem.textContent=state.lang==="da"?"Færdig ✔️":"Done ✔️"; logEvent("Breathing done"); awardBadges(); Store.save(state); } },1000);
     };
   }
 
@@ -776,7 +781,7 @@ function renderExercise(root, page){
     document.getElementById("cpAddSig").onclick=function(){ let v=document.getElementById("cpSig").value.trim(); if(!v) return; cp.signals.push(v); Store.save(state); document.getElementById("cpSig").value=""; paint(); };
     document.getElementById("cpAddSup").onclick=function(){ let v=document.getElementById("cpSup").value.trim(); if(!v) return; cp.supports.push(v); Store.save(state); document.getElementById("cpSup").value=""; paint(); };
     document.getElementById("cpAddStep").onclick=function(){ let v=document.getElementById("cpStep").value.trim(); if(!v) return; cp.list.push(v); Store.save(state); document.getElementById("cpStep").value=""; paint(); };
-    document.getElementById("cpSave").onclick=function(){ state.exercises[id]=cp; state.timeline.push({t:now(),what:"Saved coping plan"}); awardBadges(); Store.save(state); toast(EX[state.lang].saved); };
+    document.getElementById("cpSave").onclick=function(){ state.exercises[id]=cp; logEvent("Saved coping plan"); awardBadges(); Store.save(state); toast(EX[state.lang].saved); };
     paint();
   }
 
@@ -793,7 +798,7 @@ function renderExercise(root, page){
     function preview(){ let ctx=(document.getElementById("csCtx").value||'—'), obs=(document.getElementById("csObs").value||'—'), pref=(document.getElementById("csPref").value||'—'), en=(document.getElementById("csEn").value||'—');
       document.getElementById("csPreview").textContent=(state.lang==="da"?"Kontekst: ":"Context: ")+ctx+" | "+(state.lang==="da"?"Observation: ":"Observation: ")+obs+" | "+(state.lang==="da"?"Præference: ":"Preference: ")+pref+" | "+(state.lang==="da"?"Engagér: ":"Enlist: ")+en; }
     ["csCtx","csObs","csPref","csEn"].forEach(function(id){ let el=document.getElementById(id); if(el) el.addEventListener('input', preview); });
-    document.getElementById("csSave").onclick=function(){ state.exercises[id]={context:document.getElementById("csCtx").value.trim(), observation:document.getElementById("csObs").value.trim(), preference:document.getElementById("csPref").value.trim(), enlist:document.getElementById("csEn").value.trim()}; state.timeline.push({t:now(),what:"Saved care script"}); awardBadges(); Store.save(state); toast(EX[state.lang].saved); preview(); };
+    document.getElementById("csSave").onclick=function(){ state.exercises[id]={context:document.getElementById("csCtx").value.trim(), observation:document.getElementById("csObs").value.trim(), preference:document.getElementById("csPref").value.trim(), enlist:document.getElementById("csEn").value.trim()}; logEvent("Saved care script"); awardBadges(); Store.save(state); toast(EX[state.lang].saved); preview(); };
     preview();
   }
 
