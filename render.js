@@ -39,6 +39,8 @@ export function renderHome(state, t, overallProgress) {
   const pctNum = Math.round(overallProgress(state) * 100);
   const pages = Object.keys(state.completed).length;
 
+  // (Heatmap moved to home page near stress slider)
+
   const unlocked = new Set(state.badges || []);
   const badges = BADGES.map(b => {
     const name = b.n;
@@ -69,11 +71,47 @@ export function renderHome(state, t, overallProgress) {
           + '<div class="progress-ring" style="--p:' + pctNum + '%"><b>' + pctNum + '%</b></div>'
           + '<div class="notice" style="flex:1;min-width:240px;">' + t("notEmergency") + '</div>'
         + '</div>'
-        + '<article class="flow"><label for="stressSlider">' + t("stressToday") + '</label><div class="row" style="align-items:center;gap:12px;"><input id="stressSlider" type="range" min="0" max="10" value="5"><span class="chip" id="stressVal">5</span><button class="primary" id="stressSave">' + t("save") + '</button></div></article>'
-        + '<article class="flow"><h2>' + t("badgesTitle") + '</h2><div class="badgebar" id="badgeBar">' + badges + '</div></article>'
-        + '<article class="flow"><h2>' + t("activityTitle") + '</h2><div class="timeline" id="timeline">' + recent + '</div></article>'
+        + '<article class="flow"><label for="stressSlider">' + t("stressToday") + '</label><div class="row" style="align-items:center;gap:12px;"><div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;"><input id="stressSlider" type="range" min="0" max="10" value="5"><span class="chip" id="stressVal">5</span><button class="primary" id="stressSave">' + t("save") + '</button></div><div id="streakHeatmap"></div></div></article>'
+      + '<article class="flow"><h2>' + t("badgesTitle") + '</h2><div class="badgebar" id="badgeBar">' + badges + '</div></article>'
+      + '<article class="flow"><h2>' + t("activityTitle") + '</h2><div class="timeline" id="timeline">' + recent + '</div></article>'
       + '</section>'
     + '</div>';
+
+  // render streak heatmap next to stress slider
+  const heatmapEl = document.getElementById("streakHeatmap");
+  if (heatmapEl) {
+    const dayCounts = {};
+    if (state.timeline) {
+      state.timeline.forEach(ev => {
+        const key = ev.t.slice(0, 10);
+        dayCounts[key] = (dayCounts[key] || 0) + 1;
+      });
+    }
+    if (state.streak && state.streak.last) {
+      const k = state.streak.last;
+      dayCounts[k] = Math.max(dayCounts[k] || 0, 1);
+    }
+
+    const days = [];
+    const today = new Date();
+    for (let i = 29; i >= 0; i--) {
+      const d = new Date(today);
+      d.setDate(today.getDate() - i);
+      const key = d.toISOString().slice(0, 10);
+      days.push({ key, count: dayCounts[key] || 0 });
+    }
+    const max = days.reduce((m, d) => Math.max(m, d.count), 0) || 1;
+    const colors = ['#1f2937', '#9be9a8', '#40c463', '#30a14e', '#216e39'];
+    const size = 10;
+    const cells = days.map(d => {
+      const lvl = d.count ? Math.ceil((d.count / max) * (colors.length - 1)) : 0;
+      return '<span title="' + d.key + ': ' + d.count + '" style="width:' + size + 'px;height:' + size + 'px;border-radius:2px;background:' + colors[lvl] + '"></span>';
+    }).join('');
+    heatmapEl.innerHTML = '<div style="display:grid;grid-template-rows:repeat(7,' + size + 'px);grid-auto-flow:column;gap:2px">' + cells + '</div>';
+    const lbl = t("streak") + ' ' + (state.streak.count || 0);
+    heatmapEl.setAttribute('title', lbl);
+    heatmapEl.setAttribute('aria-label', lbl);
+  }
 
   const sliderEl = document.getElementById("stressSlider");
   const valChip = document.getElementById("stressVal");
