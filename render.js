@@ -1,3 +1,5 @@
+import { BADGES } from './app.js';
+
 export function renderTexts(state, t) {
   document.getElementById("brandTitle").textContent = t("brandTitle");
   document.getElementById("brandSubtitle").textContent = t("brandSubtitle");
@@ -36,17 +38,11 @@ export function renderHome(state, t, overallProgress) {
   const pctNum = Math.round(overallProgress(state) * 100);
   const pages = Object.keys(state.completed).length;
 
-  const ALL_BADGES = [
-    'Getting Started',
-    'Quarter Way',
-    'Halfway Hero',
-    'Almost There',
-    'Completed 🎉'
-  ];
   const unlocked = new Set(state.badges || []);
-  const badges = ALL_BADGES.map(b => {
-    const isUnlocked = unlocked.has(b);
-    const label = isUnlocked ? '🏅&nbsp;' + b : b;
+  const badges = BADGES.map(b => {
+    const name = b.n;
+    const isUnlocked = unlocked.has(name);
+    const label = isUnlocked ? '🏅&nbsp;' + name : name;
     const cls = isUnlocked ? 'chip' : 'chip locked';
     return '<span class="' + cls + '">' + label + '</span>';
   }).join('');
