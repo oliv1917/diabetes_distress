@@ -39,6 +39,41 @@ export function renderHome(state, t, overallProgress) {
   const pctNum = Math.round(overallProgress(state) * 100);
   const pages = Object.keys(state.completed).length;
 
+  // ==== Streak heatmap (last 30 days) ====
+  const streakEl = document.getElementById("streakText");
+  if (streakEl) {
+    const dayCounts = {};
+    if (state.timeline) {
+      state.timeline.forEach(ev => {
+        const key = ev.t.slice(0, 10);
+        dayCounts[key] = (dayCounts[key] || 0) + 1;
+      });
+    }
+    if (state.streak && state.streak.last) {
+      const k = state.streak.last;
+      dayCounts[k] = Math.max(dayCounts[k] || 0, 1);
+    }
+
+    const days = [];
+    const today = new Date();
+    for (let i = 29; i >= 0; i--) {
+      const d = new Date(today);
+      d.setDate(today.getDate() - i);
+      const key = d.toISOString().slice(0, 10);
+      days.push({ key, count: dayCounts[key] || 0 });
+    }
+    const max = days.reduce((m, d) => Math.max(m, d.count), 0) || 1;
+    const colors = ['#1f2937', '#9be9a8', '#40c463', '#30a14e', '#216e39'];
+    const cells = days.map(d => {
+      const lvl = d.count ? Math.ceil((d.count / max) * (colors.length - 1)) : 0;
+      return '<span title="' + d.key + ': ' + d.count + '" style="width:4px;height:4px;border-radius:1px;background:' + colors[lvl] + '"></span>';
+    }).join('');
+    streakEl.innerHTML = '<span style="display:grid;grid-template-rows:repeat(7,4px);grid-auto-flow:column;gap:1px">' + cells + '</span>';
+    const lbl = t("streak") + ' ' + (state.streak.count || 0);
+    streakEl.setAttribute('title', lbl);
+    streakEl.setAttribute('aria-label', lbl);
+  }
+
   const unlocked = new Set(state.badges || []);
   const badges = BADGES.map(b => {
     const name = b.n;
