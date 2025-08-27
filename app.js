@@ -228,6 +228,31 @@ function initDrawer(){
   });
 }
 
+function initTopbarMenu(){
+  const moreBtn = document.getElementById("moreBtn");
+  const actions = document.getElementById("topbarActions");
+  if(!moreBtn || !actions) return;
+
+  moreBtn.addEventListener("click", () => {
+    const open = actions.classList.toggle("open");
+    moreBtn.setAttribute("aria-expanded", open ? "true" : "false");
+  });
+
+  document.addEventListener("click", e => {
+    if(!actions.contains(e.target) && !moreBtn.contains(e.target)){
+      actions.classList.remove("open");
+      moreBtn.setAttribute("aria-expanded","false");
+    }
+  });
+
+  window.addEventListener("resize", () => {
+    if(window.innerWidth >= 600){
+      actions.classList.remove("open");
+      moreBtn.setAttribute("aria-expanded","false");
+    }
+  });
+}
+
 /* Exercise locale strings */
 const EX={
   en:{add:"Add",save:"Save",delete:"Delete",done:"Done",edit:"Edit",
@@ -751,6 +776,7 @@ function renderExercise(root, page){
 /* ========== Language Switcher & Init ========== */
 function init() {
   initDrawer();
+  initTopbarMenu();
   document.getElementById("langSelect").onchange = e => {
     state.lang = e.target.value;
     Store.save(state);
