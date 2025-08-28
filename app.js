@@ -43,6 +43,12 @@ const Lang = {
     stressToday: "How stressed are you today?",
     none: "—",
     noStreakData: "No streak data",
+    onboardSlides: [
+      "Work module by module",
+      "Streaks and badges",
+      "Data stays private."
+    ],
+    gotIt: "Got it",
 
     modulesData: [
       { id:"m1", title:"1) Orientation", goal:"Get comfortable with how the program works.", pages:[
@@ -126,6 +132,12 @@ const Lang = {
     stressToday: "Hvor stresset føler du dig i dag?",
     none: "—",
     noStreakData: "Ingen stime-data",
+    onboardSlides: [
+      "Arbejd modul for modul",
+      "Serier og badges",
+      "Data forbliver privat."
+    ],
+    gotIt: "Forstået",
 
     modulesData: [
       { id:"m1", title:"1) Introduktion", goal:"Bliv fortrolig med, hvordan programmet fungerer.", pages:[
@@ -824,6 +836,38 @@ function renderExercise(root, page){
   }
 }
 
+function showOnboarding() {
+  const slides = t('onboardSlides') || [
+    "Work module by module",
+    "Streaks and badges",
+    "Data stays private."
+  ];
+  let idx = 0;
+  const overlay = document.createElement('div');
+  overlay.style.cssText = "position:fixed;inset:0;background:rgba(0,0,0,.6);display:grid;place-items:center;z-index:1000;";
+  const modal = document.createElement('div');
+  modal.style.cssText = "background:var(--panel);color:var(--text);padding:1.5rem;border-radius:0.75rem;max-width:22rem;width:90%;text-align:center;display:grid;gap:1rem;border:1px solid var(--border);box-shadow:var(--shadow);";
+  const text = document.createElement('div');
+  text.textContent = slides[idx];
+  const btn = document.createElement('button');
+  btn.className = 'primary';
+  btn.textContent = slides.length === 1 ? t('gotIt') : t('next');
+  btn.onclick = () => {
+    idx++;
+    if (idx < slides.length) {
+      text.textContent = slides[idx];
+      btn.textContent = idx === slides.length - 1 ? t('gotIt') : t('next');
+    } else {
+      overlay.remove();
+      state.onboarded = true;
+      Store.save(state);
+    }
+  };
+  modal.appendChild(text);
+  modal.appendChild(btn);
+  overlay.appendChild(modal);
+  document.body.appendChild(overlay);
+}
 
 /* ========== Language Switcher & Init ========== */
 function init() {
@@ -850,5 +894,6 @@ function init() {
   renderTexts(state, t);
   renderSidebar(state, Lang, navigateTo);
   onRoute();
+  if (!state.onboarded) showOnboarding();
 }
 document.addEventListener("DOMContentLoaded", init);
