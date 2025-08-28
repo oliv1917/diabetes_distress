@@ -884,11 +884,11 @@ function showOnboarding() {
 function init() {
   initDrawer();
   initTopbarMenu();
-  if (state.theme === "light") document.body.classList.add("light");
+  if (state.theme === "light") document.documentElement.classList.add("light");
   const themeBtn = document.getElementById("themeToggle");
   if (themeBtn) themeBtn.onclick = () => {
     state.theme = state.theme === "light" ? "dark" : "light";
-    document.body.classList.toggle("light", state.theme === "light");
+    document.documentElement.classList.toggle("light", state.theme === "light");
     Store.save(state);
   };
   document.getElementById("langSelect").onchange = e => {

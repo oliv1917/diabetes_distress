@@ -60,9 +60,9 @@ main{min-height:70dvh}
 .page{padding:1.125rem; display:grid; gap:1rem}
 .hero{padding:1.125rem; border-bottom:1px dashed rgba(148,163,184,.25)}
 h1{font-size:clamp(1.25rem, 4vw + 0.5rem, 1.6rem); margin:0}
-h2{font-size:clamp(1rem, 3vw + 0.5rem, 1.2rem); margin:0; color:#cfe9d9}
+h2{font-size:clamp(1rem, 3vw + 0.5rem, 1.2rem); margin:0; color:var(--text)}
 .muted{color:var(--muted)}
-.meta{display:flex; gap:0.625rem; flex-wrap:wrap; color:#cbd5e1; font-size:.9rem}
+.meta{display:flex; gap:0.625rem; flex-wrap:wrap; color:var(--muted); font-size:.9rem}
 .content{display:grid; gap:1rem}
 .cta-row{display:flex; gap:0.625rem; flex-wrap:wrap}
 button,.btn{appearance:none; border:none; padding:0.625rem 0.875rem; border-radius:0.75rem; cursor:pointer;
@@ -101,12 +101,12 @@ input[type="checkbox"]{width:1.125rem;height:1.125rem}
 .progress-ring > b{width:4rem;height:4rem; border-radius:50%; background:#d1fae5; display:grid; place-items:center}
 .dnd-bucket{border:0.125rem dashed #334155; border-radius:0.625rem; padding:0.625rem; min-height:5.625rem}
 .tag{background:#0b1224; padding:0.375rem 0.625rem; border:1px solid var(--border); border-radius:999px; display:inline-flex; gap:0.375rem; align-items:center; min-height:2.75rem}
-.tag button{padding:0.375rem; background:transparent; border:none; color:#94a3b8; min-width:2.75rem; min-height:2.75rem; display:inline-flex; align-items:center; justify-content:center}
+.tag button{padding:0.375rem; background:transparent; border:none; color:var(--muted); min-width:2.75rem; min-height:2.75rem; display:inline-flex; align-items:center; justify-content:center}
 .timeline{border-left:0.125rem solid #283244; padding-left:0.75rem; display:grid; gap:0.625rem}
-.tiny{font-size:.85rem; color:#9fb0c7}
+.tiny{font-size:.85rem; color:var(--muted)}
 .breath{width:11.25rem;height:11.25rem;border-radius:50%;margin:0.625rem auto;background:radial-gradient(circle at 50% 50%, rgba(34,197,94,.35), rgba(34,197,94,0)); border:0.125rem solid #1e3a2f; animation: breathe 8s ease-in-out infinite; box-shadow: inset 0 0 2.5rem rgba(34,197,94,.3)}
 @keyframes breathe{0%{transform:scale(0.8)}50%{transform:scale(1)}100%{transform:scale(0.8)}}
-footer{color:#8aa0be; font-size:.9rem; padding:1.125rem; border-top:1px solid var(--border)}
+footer{color:var(--muted); font-size:.9rem; padding:1.125rem; border-top:1px solid var(--border)}
 @media (max-width: 900px){ .kpi{grid-template-columns: 1fr;} }
 
 @media (max-width: 600px){
@@ -165,7 +165,7 @@ footer{color:#8aa0be; font-size:.9rem; padding:1.125rem; border-top:1px solid va
 .mini-progress{display:flex; align-items:center; gap:0.625rem; margin-top:0.625rem;}
 .mini-progress .bar{position:relative; flex:1; height:0.625rem; background:#0b1224; border:1px solid var(--border); border-radius:999px; overflow:hidden;}
 .mini-progress .bar > i{position:absolute; left:0; top:0; bottom:0; width:0%; background:linear-gradient(90deg, var(--primary), #34d399); transform-origin:left center;}
-.mini-progress .txt{font-size:.9rem; color:#cfe9d9; min-width:6.875rem; text-align:right}
+.mini-progress .txt{font-size:.9rem; color:var(--text); min-width:6.875rem; text-align:right}
 
 /* Intro overlay and modal */
 .intro-overlay{
