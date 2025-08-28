@@ -9,6 +9,7 @@ export const Store = {
     const o = {};
     o.version = typeof d.version === "number" ? d.version : this.version;
     o.lang = typeof d.lang === "string" ? d.lang : "da";
+    o.theme = d.theme === "light" ? "light" : "dark";
     o.completed = d.completed && typeof d.completed === "object" ? d.completed : {};
     o.exercises = d.exercises && typeof d.exercises === "object" ? d.exercises : {};
     o.streak = d.streak && typeof d.streak.count === "number" ? { last: d.streak.last || null, count: d.streak.count } : { last: null, count: 0 };
