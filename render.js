@@ -16,6 +16,12 @@ export function renderTexts(state, t) {
     const sr2 = dataBtn.querySelector(".sr-only");
     if (sr2) sr2.textContent = t("data");
   }
+  const journalBtn = document.getElementById("journalBtn");
+  if (journalBtn) {
+    journalBtn.setAttribute("aria-label", t("journal"));
+    const srJ = journalBtn.querySelector(".sr-only");
+    if (srJ) srJ.textContent = t("journal");
+  }
   document.getElementById("langSelect").value = state.lang;
 }
 
@@ -152,4 +158,43 @@ export function renderData(state, t) {
     +     '</div>'
     +   '</section>'
     + '</div>';
+}
+
+export function renderJournal(state, t) {
+  const main = document.getElementById("main");
+  main.innerHTML = ''
+    + '<div class="page">'
+    +   '<div class="hero"><h1>' + t("journal") + '</h1></div>'
+    +   '<section class="content"><div id="journalContent"></div></section>'
+    + '</div>';
+  const cont = document.getElementById('journalContent');
+  const notes = [];
+  function walk(obj) {
+    if (!obj) return;
+    Object.values(obj).forEach(v => {
+      if (typeof v === 'string') {
+        const s = v.trim();
+        if (s) notes.push(s);
+      } else if (typeof v === 'object') {
+        walk(v);
+      }
+    });
+  }
+  walk(state.exercises);
+  if (notes.length) {
+    const list = document.createElement('div');
+    list.className = 'timeline';
+    notes.forEach(n => {
+      const item = document.createElement('div');
+      item.className = 'item';
+      item.textContent = n;
+      list.appendChild(item);
+    });
+    cont.appendChild(list);
+  } else {
+    const empty = document.createElement('div');
+    empty.className = 'tiny';
+    empty.textContent = t('journalEmpty');
+    cont.appendChild(empty);
+  }
 }
