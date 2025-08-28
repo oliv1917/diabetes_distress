@@ -14,6 +14,7 @@ export const Store = {
     o.streak = d.streak && typeof d.streak.count === "number" ? { last: d.streak.last || null, count: d.streak.count } : { last: null, count: 0 };
     o.timeline = Array.isArray(d.timeline) ? d.timeline : [];
     o.badges = Array.isArray(d.badges) ? d.badges : [];
+    o.onboarded = typeof d.onboarded === "boolean" ? d.onboarded : false;
     return o;
   },
   migrate(d) {
