@@ -4,6 +4,13 @@
   --card:#111827; --chip:#1f2937; --border:#1f2937; --shadow:0 0.625rem 1.875rem rgba(0,0,0,.35); --radius:0.875rem;
   --streak-0:#1f2937; --streak-1:#9be9a8; --streak-2:#40c463; --streak-3:#30a14e; --streak-4:#216e39;
 }
+
+:root.light{
+  --bg:#f8fafc; --panel:#ffffff; --muted:#475569; --text:#0f172a;
+  --primary:#22c55e; --primary-600:#16a34a; --accent:#0ea5e9; --warn:#d97706; --danger:#dc2626;
+  --card:#ffffff; --chip:#e2e8f0; --border:#cbd5e1; --shadow:0 0.625rem 1.875rem rgba(0,0,0,.15); --radius:0.875rem;
+  --streak-0:#e2e8f0; --streak-1:#bbf7d0; --streak-2:#86efac; --streak-3:#4ade80; --streak-4:#22c55e;
+}
 *{box-sizing:border-box}
 .sr-only{
   position:absolute;

@@ -44,6 +44,7 @@ const Lang = {
     none: "—",
     noStreakData: "No streak data",
     journal: "Journal",
+    theme: "Theme",
     journalEmpty: "No notes yet.",
     onboardSlides: [
       "Work module by module",
@@ -135,6 +136,7 @@ const Lang = {
     none: "—",
     noStreakData: "Ingen stime-data",
     journal: "Journal",
+    theme: "Tema",
     journalEmpty: "Ingen noter endnu.",
     onboardSlides: [
       "Arbejd modul for modul",
@@ -882,6 +884,13 @@ function showOnboarding() {
 function init() {
   initDrawer();
   initTopbarMenu();
+  if (state.theme === "light") document.body.classList.add("light");
+  const themeBtn = document.getElementById("themeToggle");
+  if (themeBtn) themeBtn.onclick = () => {
+    state.theme = state.theme === "light" ? "dark" : "light";
+    document.body.classList.toggle("light", state.theme === "light");
+    Store.save(state);
+  };
   document.getElementById("langSelect").onchange = e => {
     state.lang = e.target.value;
     Store.save(state);

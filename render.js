@@ -22,6 +22,12 @@ export function renderTexts(state, t) {
     const srJ = journalBtn.querySelector(".sr-only");
     if (srJ) srJ.textContent = t("journal");
   }
+  const themeBtn = document.getElementById("themeToggle");
+  if (themeBtn) {
+    themeBtn.setAttribute("aria-label", t("theme"));
+    const srT = themeBtn.querySelector(".sr-only");
+    if (srT) srT.textContent = t("theme");
+  }
   document.getElementById("langSelect").value = state.lang;
 }
 
