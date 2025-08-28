@@ -1,5 +1,5 @@
 import { Store, capArray } from './storage.js';
-import { renderTexts, renderSidebar, renderHome, renderData } from './render.js';
+import { renderTexts, renderSidebar, renderHome, renderData, renderJournal } from './render.js';
 
 export const BADGES = [
   { th: 0.01, n: "Getting Started" },
@@ -43,6 +43,8 @@ const Lang = {
     stressToday: "How stressed are you today?",
     none: "—",
     noStreakData: "No streak data",
+    journal: "Journal",
+    journalEmpty: "No notes yet.",
     onboardSlides: [
       "Work module by module",
       "Streaks and badges",
@@ -132,6 +134,8 @@ const Lang = {
     stressToday: "Hvor stresset føler du dig i dag?",
     none: "—",
     noStreakData: "Ingen stime-data",
+    journal: "Journal",
+    journalEmpty: "Ingen noter endnu.",
     onboardSlides: [
       "Arbejd modul for modul",
       "Serier og badges",
@@ -389,6 +393,11 @@ function onRoute(){
         renderHome(state, t, overallProgress);
       }
     };
+    return;
+  }
+  if (location.hash === "#/journal") {
+    renderSidebar(state, Lang, navigateTo);
+    renderJournal(state, t);
     return;
   }
   const m = location.hash.match(/#\/m\/(\d+)\/p\/(\d+)/);
@@ -888,6 +897,11 @@ function init() {
   document.getElementById("dataBtn").onclick = () => {
     location.hash = "#data";
     onRoute(); // trigger rendering immediately
+  };
+
+  document.getElementById("journalBtn").onclick = () => {
+    location.hash = "#/journal";
+    onRoute();
   };
 
   window.addEventListener("hashchange", onRoute);
