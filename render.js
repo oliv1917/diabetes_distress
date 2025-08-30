@@ -71,7 +71,7 @@ export function renderHome(state, t, overallProgress) {
   }
   const max = days.reduce((m, d) => Math.max(m, d.count), 0);
   const cells = days.map(d => {
-    const lvl = d.count ? Math.ceil((d.count / (max || 1)) * 4) : 0;
+    const lvl = Math.min(d.count, 4);
     return '<span title="' + d.key + ': ' + d.count + '" class="streak-cell level-' + lvl + '"></span>';
   }).join('');
   const streakCount = (state.streak && state.streak.count) || 0;
