@@ -76,7 +76,12 @@ export function renderHome(state, t, overallProgress) {
   }).join('');
   const streakCount = (state.streak && state.streak.count) || 0;
   const lbl = (state.lang === 'da' ? 'Stime' : 'Streak') + ' ' + streakCount;
-  streakHtml = '<div id="streakText" title="' + lbl + '" aria-label="' + lbl + '"><span class="streak-grid"></span></div>';
+  streakHtml =
+    '<section class="flow" aria-labelledby="streakHeading">'
+      + '<h2 id="streakHeading">' + t('streakHeading') + '</h2>'
+      + '<div id="streakText" title="' + lbl + '" aria-label="' + lbl + '"><span class="streak-grid"></span></div>'
+      + '<div class="tiny" id="streakLegend">' + t('streakLegendDay') + '. ' + t('streakLegendIntensity') + '</div>'
+    + '</section>';
 
   const unlocked = new Set(state.badges || []);
   const badges = BADGES.map(b => {
