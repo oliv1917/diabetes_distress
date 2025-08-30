@@ -39,7 +39,8 @@ export function renderSidebar(state, Lang, navigateTo) {
     const pct = Math.round((done / m.pages.length) * 100);
     const div = document.createElement("div");
     div.className = "mod";
-    div.innerHTML = '<div><div class="t">' + m.title + '</div><div class="tiny">' + m.goal + '</div><div class="progressbar"><i style="width:' + pct + '%"></i></div></div><div class="badge">' + pct + '%</div>';
+    const icon = m.icon ? m.icon + ' ' : '';
+    div.innerHTML = '<div><div class="t">' + icon + m.title + '</div><div class="tiny">' + m.goal + '</div><div class="progressbar"><i style="width:' + pct + '%"></i></div></div><div class="badge">' + pct + '%</div>';
     div.onclick = () => navigateTo(mi, 0);
     list.appendChild(div);
   });
