@@ -831,12 +831,12 @@ function renderExercise(root, page){
   if(kind==="values-sort"){
     let pool=state.lang==="da"?["Sundhed","Familie","Frihed","Udvikling","Venlighed","Stabilitet","Eventyr","Læring","Tro/Spiritualitet","Fællesskab","Kreativitet","Balance"]
                                :["Health","Family","Freedom","Growth","Kindness","Stability","Adventure","Learning","Faith/Spirituality","Community","Creativity","Balance"];
-    let chosen=(state.exercises[id]&&state.exercises[id].top)?state.exercises[id].top.slice():[];
+    let chosen=(state.exercises[id]&&state.exercises[id].top)?state.exercises[id].top.slice(0,5):[];
     root.innerHTML='<div class="exercise"><h2>'+page.title+'</h2><p class="tiny">'+te("pickValues")+'</p>'
       +'<div class="badgebar" id="vsPool"></div><div class="badgebar" id="vsTop"></div>'
       +'<label class="field"><span>'+te("oneAction")+'</span><input id="vsAction" type="text" placeholder="'+te("vsActionExample")+'"></label><div class="cta-row"><button class="primary" id="vsSave">'+t("save")+'</button></div></div>';
     function renderPool(){ let poolEl=document.getElementById("vsPool"); poolEl.innerHTML=pool.map(function(v){return '<span class="chip">'+v+'</span>';}).join('');
-      let chips=poolEl.querySelectorAll('.chip'); for(let i=0;i<chips.length;i++){ (function(ch){ ch.onclick=function(){ if(chosen.indexOf(ch.textContent)===-1){ chosen.push(ch.textContent); renderTop(); } }; })(chips[i]); } }
+      let chips=poolEl.querySelectorAll('.chip'); for(let i=0;i<chips.length;i++){ (function(ch){ ch.onclick=function(){ if(chosen.indexOf(ch.textContent)===-1 && chosen.length<5){ chosen.push(ch.textContent); renderTop(); } }; })(chips[i]); } }
     function renderTop(){
       let topEl=document.getElementById("vsTop");
       topEl.textContent="";
@@ -851,17 +851,30 @@ function renderExercise(root, page){
         let chip=document.createElement('span');
         chip.className='chip';
         chip.appendChild(document.createTextNode(v+' '));
+        let left=document.createElement('button');
+        left.setAttribute('aria-label','move left');
+        left.dataset.action='left';
+        left.dataset.i=i;
+        left.textContent='◀';
+        chip.appendChild(left);
+        let right=document.createElement('button');
+        right.setAttribute('aria-label','move right');
+        right.dataset.action='right';
+        right.dataset.i=i;
+        right.textContent='▶';
+        chip.appendChild(right);
         let btn=document.createElement('button');
         btn.setAttribute('aria-label','remove');
+        btn.dataset.action='remove';
         btn.dataset.i=i;
         btn.textContent='×';
         chip.appendChild(btn);
         topEl.appendChild(chip);
       });
       let btns=topEl.querySelectorAll('button');
-      for(let i=0;i<btns.length;i++){ (function(b){ b.onclick=function(){ if(confirm(t("confirmDelete"))){ let idx=+b.getAttribute('data-i'); chosen.splice(idx,1); renderTop(); } }; })(btns[i]); }
+      for(let i=0;i<btns.length;i++){ (function(b){ b.onclick=function(){ let idx=+b.getAttribute('data-i'), act=b.getAttribute('data-action'); if(act==='remove'){ if(confirm(t("confirmDelete"))){ chosen.splice(idx,1); renderTop(); } } else if(act==='left' && idx>0){ [chosen[idx-1],chosen[idx]]=[chosen[idx],chosen[idx-1]]; renderTop(); } else if(act==='right' && idx<chosen.length-1){ [chosen[idx+1],chosen[idx]]=[chosen[idx],chosen[idx+1]]; renderTop(); } }; })(btns[i]); }
     }
-    document.getElementById("vsSave").onclick=function(){ let action=document.getElementById("vsAction").value.trim(); state.exercises[id]={top:chosen.slice(), action:action};
+    document.getElementById("vsSave").onclick=function(){ let action=document.getElementById("vsAction").value.trim(); state.exercises[id]={top:chosen.slice(0,5), action:action};
       logEvent("Saved values"); awardBadges(); Store.save(state); toast(EX[state.lang].saved); };
     renderPool(); renderTop();
   }
