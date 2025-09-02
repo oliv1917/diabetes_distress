@@ -881,6 +881,7 @@ function renderExercise(root, page){
   /* ===== Coping Plan ===== */
   if(kind==="coping-plan"){
     let cp=state.exercises[id]?state.exercises[id]:{signals:[],supports:[],list:[]}; if(!cp.signals) cp.signals=[]; if(!cp.supports) cp.supports=[]; if(!cp.list) cp.list=[];
+    cp.list=cp.list.map(function(s){ return typeof s==="string"?{text:s,done:false}:{text:s.text,done:!!s.done}; });
     root.innerHTML=DOMPurify.sanitize('<div class="exercise"><h2>'+page.title+'</h2>'
       +'<div class="row"><label class="field"><span>'+te("earlySign")+'</span><input id="cpSig" type="text" placeholder="'+te("cpSigExample")+'"></label><button class="primary" id="cpAddSig">'+t("add")+'</button></div><div class="badgebar" id="cpSigList"></div>'
       +'<div class="row"><label class="field"><span>'+te("support")+'</span><input id="cpSup" type="text" placeholder="'+te("cpSupExample")+'"></label><button class="primary" id="cpAddSup">'+t("add")+'</button></div><div class="badgebar" id="cpSupList"></div>'
@@ -895,13 +896,27 @@ function renderExercise(root, page){
       if(cp.supports.length){ cp.supports.forEach(function(s,i){ let chip=document.createElement("span"); chip.className="chip"; let txt=document.createElement("span"); txt.textContent=s; let btn=document.createElement("button"); btn.setAttribute("data-t","sup"); btn.setAttribute("data-i",i); btn.textContent="×"; chip.appendChild(txt); chip.appendChild(btn); supList.appendChild(chip); }); } else { let emptySup=document.createElement("span"); emptySup.className="tiny"; emptySup.textContent=te("noSupports"); supList.appendChild(emptySup); }
       let stepList=document.getElementById("cpSteps");
       stepList.textContent="";
-      if(cp.list.length){ cp.list.forEach(function(s,i){ let row=document.createElement("div"); row.className="item"; let div=document.createElement("div"); div.textContent=s; let btn=document.createElement("button"); btn.className="ghost"; btn.setAttribute("data-t","step"); btn.setAttribute("data-i",i); btn.textContent=t("delete"); row.appendChild(div); row.appendChild(btn); stepList.appendChild(row); }); } else { let emptyStep=document.createElement("div"); emptyStep.className="tiny"; emptyStep.textContent=te("noSteps"); stepList.appendChild(emptyStep); }
+      if(cp.list.length){
+        cp.list.forEach(function(s,i){
+          let row=document.createElement("div"); row.className="item";
+          row.addEventListener('dragover',function(e){e.preventDefault();});
+          row.addEventListener('drop',function(e){ e.preventDefault(); let from=+e.dataTransfer.getData('text/plain'); if(from===i) return; let item=cp.list.splice(from,1)[0]; cp.list.splice(i,0,item); Store.save(state); paint(); });
+          let handle=document.createElement("span"); handle.className="drag"; handle.draggable=true; handle.textContent="☰"; handle.addEventListener('dragstart',function(e){ e.dataTransfer.setData('text/plain', i); });
+          let chk=document.createElement("input"); chk.type="checkbox"; chk.checked=!!s.done; chk.onchange=function(){ cp.list[i].done=chk.checked; Store.save(state); };
+          let div=document.createElement("div"); div.textContent=s.text; if(s.done) div.style.textDecoration="line-through";
+          let btn=document.createElement("button"); btn.className="ghost"; btn.setAttribute("data-t","step"); btn.setAttribute("data-i",i); btn.textContent=t("delete");
+          row.appendChild(handle); row.appendChild(chk); row.appendChild(div); row.appendChild(btn);
+          stepList.appendChild(row);
+        });
+      } else {
+        let emptyStep=document.createElement("div"); emptyStep.className="tiny"; emptyStep.textContent=te("noSteps"); stepList.appendChild(emptyStep);
+      }
       let btns=document.querySelectorAll("#cpSigList button,#cpSupList button,#cpSteps button");
       for(let i=0;i<btns.length;i++){ (function(b){ b.onclick=function(){ if(confirm(t("confirmDelete"))){ let ttype=b.getAttribute('data-t'), ii=+b.getAttribute('data-i'); if(ttype==="sig") cp.signals.splice(ii,1); else if(ttype==="sup") cp.supports.splice(ii,1); else cp.list.splice(ii,1); Store.save(state); paint(); } }; })(btns[i]); }
     }
     document.getElementById("cpAddSig").onclick=function(){ let v=document.getElementById("cpSig").value.trim(); if(!v) return; cp.signals.push(v); Store.save(state); document.getElementById("cpSig").value=""; paint(); };
     document.getElementById("cpAddSup").onclick=function(){ let v=document.getElementById("cpSup").value.trim(); if(!v) return; cp.supports.push(v); Store.save(state); document.getElementById("cpSup").value=""; paint(); };
-    document.getElementById("cpAddStep").onclick=function(){ let v=document.getElementById("cpStep").value.trim(); if(!v) return; cp.list.push(v); Store.save(state); document.getElementById("cpStep").value=""; paint(); };
+    document.getElementById("cpAddStep").onclick=function(){ let v=document.getElementById("cpStep").value.trim(); if(!v) return; cp.list.push({text:v,done:false}); Store.save(state); document.getElementById("cpStep").value=""; paint(); };
     document.getElementById("cpSave").onclick=function(){ state.exercises[id]=cp; logEvent("Saved coping plan"); awardBadges(); Store.save(state); toast(EX[state.lang].saved); };
     paint();
   }
