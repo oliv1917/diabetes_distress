@@ -737,7 +737,37 @@ function renderExercise(root, page){
       +'<div class="cta-row"><button class="primary" id="psSave">'+te("savePlan")+'</button></div></div>');
     let chosen=(function(arr){let s=new Set(); for(let i=0;i<arr.length;i++) s.add(arr[i]); return s;})(data.chosen||[]);
     function renderOptions(){ let cont=document.getElementById("psOptions"); cont.innerHTML=data.options.length?"":"<span class=\"tiny\">"+te("selectHint")+"</span>";
-      data.options.forEach(function(o,i){ let el=document.createElement('span'); el.className="chip"; el.textContent=o+(chosen.has(i)?" ✓":""); el.onclick=function(){ if(chosen.has(i)) chosen.delete(i); else chosen.add(i); renderOptions(); }; cont.appendChild(el); });
+      data.options.forEach(function(o,i){
+        let el=document.createElement('span');
+        el.className="chip";
+        el.onclick=function(){ if(chosen.has(i)) chosen.delete(i); else chosen.add(i); renderOptions(); };
+        let label=document.createElement('span');
+        label.textContent=o+(chosen.has(i)?" ✓":"");
+        el.appendChild(label);
+        let edit=document.createElement('button');
+        edit.className="tiny";
+        edit.textContent="✎";
+        edit.onclick=function(e){
+          e.stopPropagation();
+          let input=document.createElement('input');
+          input.type='text';
+          input.value=o;
+          function commit(){
+            let v=input.value.trim();
+            data.options[i]=v;
+            state.exercises[id]=data; Store.save(state);
+            renderOptions();
+          }
+          input.onblur=commit;
+          input.onkeydown=function(ev){ if(ev.key==='Enter') commit(); };
+          el.innerHTML='';
+          el.appendChild(input);
+          input.focus();
+        };
+        el.appendChild(document.createTextNode(' '));
+        el.appendChild(edit);
+        cont.appendChild(el);
+      });
     }
     document.getElementById("psAdd").onclick=function(){ let v=document.getElementById("psOpt").value.trim(); if(!v) return; data.options.push(v); document.getElementById("psOpt").value=""; state.exercises[id]=data; Store.save(state); renderOptions(); };
     document.getElementById("psSave").onclick=function(){ data.problem=document.getElementById("psProb").value.trim();
