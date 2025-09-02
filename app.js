@@ -299,7 +299,7 @@ export const EX={
       defineProblem:"Define the problem", option:"Option", addOption:"Add Option", when:"when", where:"where", how:"how", savePlan:"Save Plan", selectHint:"Add a few options, then click to select your step.",
       action:"Action", energy:"Energy cost (1–5)", whenTime:"When", noActions:"No actions yet.",
       pickValues:"Pick your top 3–5 values. Then write one action for this week.", oneAction:"One small value-aligned action",
-      breathingNote:"4-4-6 breathing. Inhale 4 • Hold 4 • Exhale 6", startTimer:"Start 1-minute timer", seconds:"s",
+      breathingNote:"4-4-6 breathing. Inhale 4 • Hold 4 • Exhale 6", startTimer:"Start timer", seconds:"s",
       earlySign:"Early warning sign", support:"Support person / service", step:"Coping step", noSigns:"No signs yet.", noSupports:"No supports yet.", noSteps:"No steps yet.",
       context:"Context", observation:"Observation", preference:"Preference (ask)", enlist:"Enlist", preview:"Script preview",
       risk:"Risk situation", addPair:"Add Pair", ifCue:"If (cue)", thenAct:"Then (action)", noRisks:"No risks yet.", noPairs:"No pairs yet.",
@@ -323,7 +323,7 @@ export const EX={
       defineProblem:"Definér problemet", option:"Mulighed", addOption:"Tilføj mulighed", when:"hvornår", where:"hvor", how:"hvordan", savePlan:"Gem plan", selectHint:"Tilføj et par muligheder, og klik for at vælge dit skridt.",
       action:"Handling", energy:"Energikrav (1–5)", whenTime:"Hvornår", noActions:"Ingen handlinger endnu.",
       pickValues:"Vælg dine 3–5 vigtigste værdier. Skriv derefter én handling for ugen.", oneAction:"Én lille værdistyret handling",
-      breathingNote:"4-4-6 vejrtrækning. Ind 4 • Hold 4 • Ud 6", startTimer:"Start 1-minuts timer", seconds:"s",
+      breathingNote:"4-4-6 vejrtrækning. Ind 4 • Hold 4 • Ud 6", startTimer:"Start timer", seconds:"s",
       earlySign:"Tidligt faresignal", support:"Støtteperson / tilbud", step:"Mestringsskridt", noSigns:"Ingen tegn endnu.", noSupports:"Ingen støtter endnu.", noSteps:"Ingen skridt endnu.",
       context:"Kontekst", observation:"Observation", preference:"Præference (ønske)", enlist:"Engagér", preview:"Forhåndsvisning af manuskript",
       risk:"Risikosituation", addPair:"Tilføj par", ifCue:"Hvis (cue)", thenAct:"Så (handling)", noRisks:"Ingen risici endnu.", noPairs:"Ingen par endnu.",
@@ -870,9 +870,9 @@ function renderExercise(root, page){
   if(kind==="breathing"){
     root.innerHTML='<div class="exercise center"><h2>'+page.title+'</h2>'
       +'<div class="tiny">'+te("breathingNote")+'</div><div class="breath" aria-label="Breathing animation"></div>'
-      +'<div class="cta-row center" style="justify-content:center"><button id="brStart" class="primary">'+te("startTimer")+'</button><div class="chip" id="brRemain">—</div></div></div>';
+      +'<div class="cta-row center" style="justify-content:center"><select id="brLen"><option value="30">30'+te("seconds")+'</option><option value="60" selected>60'+te("seconds")+'</option><option value="120">120'+te("seconds")+'</option></select><button id="brStart" class="primary">'+te("startTimer")+'</button><div class="chip" id="brRemain">—</div></div></div>';
     document.getElementById("brStart").onclick=function(){
-      let secs=60; let rem=document.getElementById("brRemain"); rem.textContent="60"+te("seconds");
+      let secs=+document.getElementById("brLen").value; let rem=document.getElementById("brRemain"); rem.textContent=secs+te("seconds");
       let id=setInterval(function(){ secs--; rem.textContent=secs+te("seconds");
         if(secs<=0){ clearInterval(id); rem.textContent=state.lang==="da"?"Færdig ✔️":"Done ✔️"; logEvent("Breathing done"); awardBadges(); Store.save(state); } },1000);
     };
