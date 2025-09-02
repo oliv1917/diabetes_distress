@@ -779,11 +779,12 @@ function renderExercise(root, page){
   /* ===== Activity Planner ===== */
   if(kind==="activity-planner"){
     let acts=(state.exercises[id]&&state.exercises[id].acts)?state.exercises[id].acts:[];
+    let editIdx=null;
     root.innerHTML='<div class="exercise"><h2>'+page.title+'</h2>'
       +'<p class="tiny">'+(state.lang==="da"?"Planlæg 2–3 små handlinger de næste 48 timer. Hold dem små.":"Plan 2–3 small actions for the next 48 hours. Keep them tiny.")+'</p>'
       +'<div class="row"><label class="field"><span>'+te("action")+'</span><input id="apTask" type="text" placeholder="'+te("apTaskExample")+'"></label>'
       +'<label class="field"><span>'+te("energy")+'</span><input id="apCost" type="number" min="1" max="5" value="2"></label>'
-      +'<label class="field"><span>'+te("whenTime")+'</span><input id="apWhen" type="text" placeholder="'+te("apWhenExample")+'"></label>'
+      +'<label class="field"><span>'+te("whenTime")+'</span><input id="apWhen" type="datetime-local"></label>'
       +'<button class="primary" id="apAdd">'+t("add")+'</button></div>'
       +'<div class="list" id="apList"></div></div>';
     function paint(){ let list=document.getElementById("apList"); list.innerHTML=acts.length?"":"<div class=\"tiny\">"+te("noActions")+"</div>";
@@ -796,7 +797,8 @@ function renderExercise(root, page){
         top.appendChild(strong);
         let span=document.createElement('span');
         span.className="tiny";
-        span.textContent='Cost '+a.cost+'/5 • '+a.when;
+        let whenDisp=a.when && !isNaN(Date.parse(a.when))?new Date(a.when).toLocaleString():a.when;
+        span.textContent='Cost '+a.cost+'/5 • '+whenDisp;
         top.appendChild(document.createTextNode(' '));
         top.appendChild(span);
         row.appendChild(top);
@@ -811,18 +813,38 @@ function renderExercise(root, page){
         label.appendChild(input);
         label.appendChild(document.createTextNode(' '+te("done")));
         row2.appendChild(label);
-        let btn=document.createElement('button');
-        btn.className="ghost";
-        btn.setAttribute('data-i',i);
-        btn.textContent=t("delete");
-        btn.onclick=function(){ if(confirm(t("confirmDelete"))){ acts.splice(i,1); state.exercises[id]={acts:acts}; Store.save(state); paint(); } };
-        row2.appendChild(btn);
+        let editBtn=document.createElement('button');
+        editBtn.className="ghost";
+        editBtn.textContent=t("edit");
+        editBtn.onclick=function(){
+          document.getElementById("apTask").value=a.task;
+          document.getElementById("apCost").value=a.cost;
+          document.getElementById("apWhen").value=a.when||"";
+          editIdx=i;
+          document.getElementById("apAdd").textContent=t("save");
+        };
+        row2.appendChild(editBtn);
+        let delBtn=document.createElement('button');
+        delBtn.className="ghost";
+        delBtn.setAttribute('data-i',i);
+        delBtn.textContent=t("delete");
+        delBtn.onclick=function(){ if(confirm(t("confirmDelete"))){ acts.splice(i,1); state.exercises[id]={acts:acts}; Store.save(state); paint(); } };
+        row2.appendChild(delBtn);
         row.appendChild(row2);
         input.onchange=function(e){ acts[i].done=e.target.checked; state.exercises[id]={acts:acts}; Store.save(state); };
         list.appendChild(row);
       }); }
     document.getElementById("apAdd").onclick=function(){ let task=document.getElementById("apTask").value.trim(), cost=+document.getElementById("apCost").value, when=document.getElementById("apWhen").value.trim();
-      if(!task) return; acts.push({task:task,cost:clamp(cost,1,5),when:when,done:false}); state.exercises[id]={acts:acts}; Store.save(state); paint();
+      if(!task) return;
+      if(editIdx!==null){
+        let done=acts[editIdx].done;
+        acts[editIdx]={task:task,cost:clamp(cost,1,5),when:when,done:done};
+        editIdx=null;
+        document.getElementById("apAdd").textContent=t("add");
+      } else {
+        acts.push({task:task,cost:clamp(cost,1,5),when:when,done:false});
+      }
+      state.exercises[id]={acts:acts}; Store.save(state); paint();
       document.getElementById("apTask").value=""; document.getElementById("apCost").value=2; document.getElementById("apWhen").value=""; };
     paint();
   }
