@@ -293,7 +293,7 @@ export const EX={
   en:{add:"Add",save:"Save",delete:"Delete",done:"Done",edit:"Edit",
       distressQ:"Rate your current diabetes distress (0 = none, 10 = max)", bodyQ:"Where do you feel it in your body?", noteQ:"Short note (optional)", viewTrend:"View personal trend", chartHint:"Your saved ratings will show here as a line chart.",
       trigger:"Trigger", typicalThought:"Typical thought", feelingWord:"Feeling (word + 0–10)", noTriggers:"No triggers logged yet.",
-      situation:"Situation", autoThought:"Automatic thought", feelingNum:"Feeling 0–10", evidence:"Evidence for/against", altThought:"Balanced alternative thought", addRow:"Add row", noEntries:"No entries yet.",
+      situation:"Situation", autoThought:"Automatic thought", feelingNum:"Feeling 0–10", feelingAfter:"Feeling after 0–10", evidence:"Evidence for/against", altThought:"Balanced alternative thought", addRow:"Add row", noEntries:"No entries yet.",
       thoughts:"Thoughts", buckets:"Buckets", dropHere:"Drop here", reframePick:"Pick one thought and write a balanced reframe", origThought:"Original thought", balanced:"Balanced reframe",
       allOrNothing:"All-or-nothing", mindReading:"Mind reading", catastrophizing:"Catastrophizing", shoulds:"‘Should’ statements",
       defineProblem:"Define the problem", option:"Option", addOption:"Add Option", when:"when", where:"where", how:"how", savePlan:"Save Plan", selectHint:"Add a few options, then click to select your step.",
@@ -317,7 +317,7 @@ export const EX={
   da:{add:"Tilføj",save:"Gem",delete:"Slet",done:"Færdig",edit:"Redigér",
       distressQ:"Vurdér din nuværende diabetes-stress (0 = ingen, 10 = maks.)", bodyQ:"Hvor mærker du det i kroppen?", noteQ:"Kort note (valgfrit)", viewTrend:"Se personlig udvikling", chartHint:"Dine gemte vurderinger vises her som en linjegraf.",
       trigger:"Trigger", typicalThought:"Typisk tanke", feelingWord:"Følelse (ord + 0–10)", noTriggers:"Ingen triggere endnu.",
-      situation:"Situation", autoThought:"Automatisk tanke", feelingNum:"Følelse 0–10", evidence:"Beviser for/imod", altThought:"Balanceret alternativ tanke", addRow:"Tilføj række", noEntries:"Ingen indtastninger endnu.",
+      situation:"Situation", autoThought:"Automatisk tanke", feelingNum:"Følelse 0–10", feelingAfter:"Følelse efter 0–10", evidence:"Beviser for/imod", altThought:"Balanceret alternativ tanke", addRow:"Tilføj række", noEntries:"Ingen indtastninger endnu.",
       thoughts:"Tanker", buckets:"Kategorier", dropHere:"Slip her", reframePick:"Vælg én tanke og skriv en balanceret omformulering", origThought:"Oprindelig tanke", balanced:"Balanceret omformulering",
       allOrNothing:"Sort-hvid tænkning", mindReading:"Tankelæsning", catastrophizing:"Katastrofetænkning", shoulds:"‘Bør’-udsagn",
       defineProblem:"Definér problemet", option:"Mulighed", addOption:"Tilføj mulighed", when:"hvornår", where:"hvor", how:"hvordan", savePlan:"Gem plan", selectHint:"Tilføj et par muligheder, og klik for at vælge dit skridt.",
@@ -609,6 +609,7 @@ function renderExercise(root, page){
       +'<label class="field"><span>'+te("feelingNum")+'</span><input id="trFeeling" type="number" min="0" max="10" value="6"></label></div>'
       +'<label class="field"><span>'+te("evidence")+'</span><textarea id="trEvidence" rows="3" placeholder="'+te("trEvidenceExample")+'"></textarea></label>'
       +'<label class="field"><span>'+te("altThought")+'</span><input id="trAlt" type="text" placeholder="'+te("trAltExample")+'"></label>'
+      +'<label class="field"><span>'+te("feelingAfter")+'</span><input id="trAfter" type="number" min="0" max="10" value="3"></label>'
       +'<div class="cta-row"><button class="primary" id="trAdd">'+te("addRow")+'</button></div>'
       +'<div class="list" id="trList"></div></div>';
     function paint(){
@@ -625,7 +626,8 @@ function renderExercise(root, page){
         let em=document.createElement('em');
         em.textContent=r.thought;
         top.appendChild(em);
-        top.appendChild(document.createTextNode(' ( '+r.feel+'/10 )'));
+        let rating=r.feelAfter!==undefined?r.feel+'→'+r.feelAfter:r.feel;
+        top.appendChild(document.createTextNode(' ( '+rating+'/10 )'));
         wrap.appendChild(top);
         let eviDiv=document.createElement('div');
         eviDiv.className="tiny";
@@ -647,10 +649,10 @@ function renderExercise(root, page){
     }
     document.getElementById("trAdd").onclick=function(){
       let sit=document.getElementById("trSit").value.trim(), th=document.getElementById("trThought").value.trim(), feel=+document.getElementById("trFeeling").value;
-      let evi=document.getElementById("trEvidence").value.trim(), alt=document.getElementById("trAlt").value.trim();
+      let evi=document.getElementById("trEvidence").value.trim(), alt=document.getElementById("trAlt").value.trim(), fa=+document.getElementById("trAfter").value;
       if(!sit||!th){ toast(te("situation")+" + "+te("autoThought")); return; }
-      rows.push({sit:sit,thought:th,feel:clamp(feel,0,10),evi:evi,alt:alt}); state.exercises[id]={rows:rows}; Store.save(state); paint();
-      document.getElementById("trSit").value=""; document.getElementById("trThought").value=""; document.getElementById("trFeeling").value=5; document.getElementById("trEvidence").value=""; document.getElementById("trAlt").value="";
+      rows.push({sit:sit,thought:th,feel:clamp(feel,0,10),feelAfter:clamp(fa,0,10),evi:evi,alt:alt}); state.exercises[id]={rows:rows}; Store.save(state); paint();
+      document.getElementById("trSit").value=""; document.getElementById("trThought").value=""; document.getElementById("trFeeling").value=5; document.getElementById("trEvidence").value=""; document.getElementById("trAlt").value=""; document.getElementById("trAfter").value=3;
     };
     paint();
   }
