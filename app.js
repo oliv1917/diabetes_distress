@@ -511,13 +511,34 @@ function renderExercise(root, page){
       let c=document.getElementById("miniChart"); if(!c) return;
       let ctx=c.getContext('2d'); ctx.clearRect(0,0,600,160);
       let pts=(state.exercises[id]&&state.exercises[id].trend)?state.exercises[id].trend:[];
-      if(pts.length===0){ ctx.fillStyle="#94a3b8"; ctx.fillText(te("chartHint"),10,30); return; }
-      let pad=30,w=600-pad*2,h=160-pad*2; ctx.strokeStyle="#334155"; ctx.strokeRect(pad,pad,w,h);
+      let pad=40,w=600-pad*2,h=160-pad*2;
+
+      // axes
+      ctx.strokeStyle="#334155"; ctx.lineWidth=1;
+      ctx.beginPath(); ctx.moveTo(pad,pad); ctx.lineTo(pad,pad+h); ctx.lineTo(pad+w,pad+h); ctx.stroke();
+
+      // Y axis labels 0-10
+      ctx.fillStyle="#334155"; ctx.font="10px sans-serif";
+      ctx.textAlign="right"; ctx.textBaseline="middle";
+      for(let r=0;r<=10;r+=2){ let y=pad+(10-r)/10*h; ctx.fillText(String(r),pad-5,y); }
+
+      if(pts.length===0){ ctx.fillStyle="#94a3b8"; ctx.textAlign="left"; ctx.textBaseline="alphabetic"; ctx.fillText(te("chartHint"),pad+10,pad+20); return; }
+
       let xs=pts.map(function(p,i){return pad+i*(w/Math.max(1,pts.length-1));});
       let ys=pts.map(function(p){return pad+(10-p.v)/10*h;});
+
+      // line
       ctx.strokeStyle="#22c55e"; ctx.lineWidth=2; ctx.beginPath();
       for(let i=0;i<xs.length;i++){ if(i===0) ctx.moveTo(xs[i],ys[i]); else ctx.lineTo(xs[i],ys[i]); } ctx.stroke();
-      ctx.fillStyle="#22c55e"; for(let j=0;j<xs.length;j++){ ctx.beginPath(); ctx.arc(xs[j],ys[j],3,0,Math.PI*2); ctx.fill(); }
+
+      // points and date labels
+      ctx.fillStyle="#22c55e";
+      ctx.textAlign="center"; ctx.textBaseline="top";
+      for(let j=0;j<xs.length;j++){ ctx.beginPath(); ctx.arc(xs[j],ys[j],3,0,Math.PI*2); ctx.fill(); ctx.fillText(pts[j].d.slice(5),xs[j],pad+h+5); }
+
+      // axis titles
+      ctx.fillStyle="#334155"; ctx.textAlign="center"; ctx.textBaseline="bottom"; ctx.fillText("Date",pad+w/2,160);
+      ctx.save(); ctx.translate(10,pad+h/2); ctx.rotate(-Math.PI/2); ctx.textAlign="center"; ctx.textBaseline="top"; ctx.fillText("Rating",0,0); ctx.restore();
     }
     document.getElementById("drSave").onclick=function(){
       let rating=+document.getElementById("drRange").value;
