@@ -671,14 +671,46 @@ function renderExercise(root, page){
       +'<label class="field"><span>'+te("origThought")+'</span><input id="rfOrig" type="text" placeholder="'+te("rfOrigExample")+'"></label>'
       +'<label class="field"><span>'+te("balanced")+'</span><input id="rfNew" type="text" placeholder="'+te("rfNewExample")+'"></label>'
       +'<div class="cta-row"><button class="primary" id="rfSave">'+t("save")+'</button></div></div>';
-    let cards=document.getElementById("cards"); examples.forEach(function(ex){ let c=document.createElement('span'); c.className="tag drag"; c.textContent=ex.text; c.draggable=true; c.dataset.k=ex.k; c.addEventListener('dragstart',function(e){ e.dataTransfer.setData('text/plain', JSON.stringify(ex)); }); cards.appendChild(c); });
-    let buckets=document.querySelectorAll(".dnd-bucket");
+    let cards=document.getElementById("cards"), cardEls=[], selectedCard=null;
+    examples.forEach(function(ex){
+      let c=document.createElement('span');
+      c.className="tag drag";
+      c.textContent=ex.text;
+      c.draggable=true;
+      c.dataset.k=ex.k;
+      c.tabIndex=0;
+      c.addEventListener('dragstart',function(e){ e.dataTransfer.setData('text/plain', JSON.stringify(ex)); });
+      c.addEventListener('keydown',function(e){
+        let idx=cardEls.indexOf(c);
+        if(e.key==='ArrowRight'&&idx<cardEls.length-1){ e.preventDefault(); cardEls[idx+1].focus(); }
+        else if(e.key==='ArrowLeft'&&idx>0){ e.preventDefault(); cardEls[idx-1].focus(); }
+        else if(e.key==='ArrowDown'){ e.preventDefault(); bucketEls[0].focus(); }
+        else if(e.key==='Enter'||e.key===' '){ e.preventDefault(); selectedCard=c; bucketEls[0].focus(); }
+      });
+      cardEls.push(c);
+      cards.appendChild(c);
+    });
+    let buckets=document.querySelectorAll(".dnd-bucket"), bucketEls=Array.from(buckets);
     for(let i=0;i<buckets.length;i++){ (function(b){
       b.addEventListener('dragover',function(e){e.preventDefault();});
       b.addEventListener('drop',function(e){ e.preventDefault(); let ex=JSON.parse(e.dataTransfer.getData('text/plain')); let ok=b.dataset.k===ex.k;
         let tag=document.createElement('div'); tag.className="tag"; tag.innerHTML=ex.text+' '+(ok?'✅':'❓');
         b.querySelector('.bucket').appendChild(tag);
         done.push({text:ex.text,placed:b.dataset.k,correct:ok}); if(!state.exercises[id]) state.exercises[id]={}; state.exercises[id].done=done; Store.save(state);
+      });
+      b.addEventListener('keydown',function(e){
+        let idx=bucketEls.indexOf(b);
+        if(e.key==='ArrowRight'&&idx%2===0&&idx+1<bucketEls.length){ e.preventDefault(); bucketEls[idx+1].focus(); }
+        else if(e.key==='ArrowLeft'&&idx%2===1){ e.preventDefault(); bucketEls[idx-1].focus(); }
+        else if(e.key==='ArrowDown'&&idx+2<bucketEls.length){ e.preventDefault(); bucketEls[idx+2].focus(); }
+        else if(e.key==='ArrowUp'){ e.preventDefault(); if(idx<2){ (selectedCard||cardEls[0]).focus(); } else { bucketEls[idx-2].focus(); } }
+        else if(e.key==='Enter'||e.key===' '){
+          if(selectedCard){ e.preventDefault(); let ex={text:selectedCard.textContent,k:selectedCard.dataset.k}; let ok=b.dataset.k===ex.k;
+            let tag=document.createElement('div'); tag.className="tag"; tag.innerHTML=ex.text+' '+(ok?'✅':'❓');
+            b.querySelector('.bucket').appendChild(tag);
+            done.push({text:ex.text,placed:b.dataset.k,correct:ok}); if(!state.exercises[id]) state.exercises[id]={}; state.exercises[id].done=done; Store.save(state);
+            selectedCard=null; }
+        }
       });
     })(buckets[i]); }
     document.getElementById("rfSave").onclick=function(){
