@@ -562,23 +562,30 @@ function renderExercise(root, page){
       +'<label class="field"><span>'+te("feelingWord")+'</span><input id="tgFeel" type="text" placeholder="'+te("tgFeelExample")+'"></label>'
       +'<button class="primary" id="tgAdd">'+t("add")+'</button></div><div class="list" id="tgList"></div></div>';
     function paint(){
-      let list=document.getElementById("tgList"); list.innerHTML=items.length?"":"<div class='tiny'>"+te("noTriggers")+"</div>";
+      let list=document.getElementById("tgList");
+      list.innerHTML=items.length?"":"<div class='tiny'>"+te("noTriggers")+"</div>";
       items.forEach(function(it,idx){
         let row=document.createElement('div');
         row.className="item";
-        let info=document.createElement('div');
-        let strong=document.createElement('strong');
-        strong.textContent=it.n;
-        info.appendChild(strong);
-        let tiny=document.createElement('div');
-        tiny.className="tiny";
-        tiny.textContent=it.t+' • '+it.f;
-        info.appendChild(tiny);
-        row.appendChild(info);
+        let name=document.createElement('input');
+        name.type="text"; name.value=it.n; name.placeholder=te("trigger");
+        row.appendChild(name);
+        let thought=document.createElement('input');
+        thought.type="text"; thought.value=it.t; thought.placeholder=te("typicalThought");
+        row.appendChild(thought);
+        let feel=document.createElement('input');
+        feel.type="text"; feel.value=it.f; feel.placeholder=te("feelingWord");
+        row.appendChild(feel);
+        let save=document.createElement('button');
+        save.className="ghost"; save.textContent=t("save");
+        save.onclick=function(){
+          items[idx]={n:name.value.trim(), t:thought.value.trim(), f:feel.value.trim()};
+          state.exercises[id]={items:items};
+          Store.save(state); paint();
+        };
+        row.appendChild(save);
         let btn=document.createElement('button');
-        btn.className="ghost";
-        btn.setAttribute('data-i',idx);
-        btn.textContent=t("delete");
+        btn.className="ghost"; btn.setAttribute('data-i',idx); btn.textContent=t("delete");
         btn.onclick=function(){ if(confirm(t("confirmDelete"))){ items.splice(idx,1); state.exercises[id]={items:items}; Store.save(state); paint(); } };
         row.appendChild(btn);
         list.appendChild(row);
