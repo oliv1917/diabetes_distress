@@ -1,5 +1,6 @@
 import DOMPurify from 'dompurify';
 import { useEffect, useMemo, useState } from 'react';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import { Link, useParams } from 'react-router-dom';
 import { EX, LANG } from '../data/content.js';
 
