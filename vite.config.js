@@ -11,5 +11,9 @@ export default defineConfig({
   },
   build: {
     outDir: 'dist'
+export default defineConfig({
+  plugins: [react()],
+  server: {
+    host: true
   }
 });
