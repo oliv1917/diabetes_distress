@@ -1,59 +1,17 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="da">
-<head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Diabetes-stress iCBT</title>
-<meta name="description" content="En iCBT-lignende webapp til diabetes-stress med moduler, øvelser og fremskridtssporing. Både dansk og engelsk." />
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css">
-</head>
-<body>
-<header>
-  <div class="wrap topbar">
-    <button class="ghost" id="menuBtn" aria-label="Menu"><span class="sr-only">Menu</span>☰</button>
-    <div class="brand">
-      <div class="logo"></div>
-      <div>
-        <div id="brandTitle"></div>
-        <div class="tiny" id="brandSubtitle"></div>
-      </div>
-    </div>
-    <div class="spacer"></div>
-    <div class="actions" id="topbarActions">
-      <button class="ghost" id="homeBtn" aria-label="Forside"><span class="sr-only">Forside</span>🏠</button>
-      <button class="ghost" id="dataBtn" aria-label="Data"><span class="sr-only">Data</span>💾</button>
-      <button class="ghost" id="journalBtn" aria-label="Journal"><span class="sr-only">Journal</span>📝</button>
-      <button class="ghost" id="themeToggle" aria-label="Tema"><span class="sr-only">Tema</span>🌓</button>
-      <select id="langSelect" class="ghost">
-        <option value="da">Dansk</option>
-        <option value="en">English</option>
-      </select>
-    </div>
-    <button class="ghost" id="moreBtn" aria-label="Menu" aria-haspopup="true" aria-expanded="false"><span class="sr-only">Menu</span>…</button>
-  </div>
-</header>
-
-<div id="drawerOverlay" class="overlay" hidden></div>
-
-<div class="wrap layout">
-  <div id="drawer" class="drawer">
-    <aside class="card sidebar">
-      <h2 id="modulesTitle"></h2>
-      <div id="moduleList"></div>
-    </aside>
-  </div>
-
-  <main class="card" id="main" role="main">
-    <!-- Home / module pages are injected here -->
-  </main>
-</div>
-
-<footer class="wrap">
-  <div id="footerText"></div>
-</footer>
-<script src="https://cdn.jsdelivr.net/npm/dompurify@3.0.8/dist/purify.min.js"></script>
-<script type="module" src="app.js"></script>
-</body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Diabetes-stress iCBT</title>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
 </html>
