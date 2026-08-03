@@ -12,6 +12,7 @@ export default defineConfig({
   build: {
     outDir: 'dist'
 export default defineConfig({
+  base: './',
   plugins: [react()],
   server: {
     host: true
